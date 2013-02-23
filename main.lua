@@ -45,9 +45,6 @@ function Initialize( Plugin )
 end
 
 
-
-
-
 function OnDisable()
     local loopPlayers = function( Player )
 			local ClientHandle = Player:GetClientHandle()

@@ -35,33 +35,35 @@ end
 
 function HandleLoginCommand( Split, Player)
 	if Auth[Player:GetName()] == false then
-		PlayerPass = (io.input(PluginDir .. "Players/" .. Player:GetName()):read())
 		if (Split[2] == nil) then
-			Player:SendMessage(cChatColor.LightGreen .. "Usage: /login (password)")
+		Player:SendMessage(cChatColor.LightGreen .. "Usage: /login (password)")
 		else
+			local PlayerPass = io.open(PluginDir .. "Players/" .. Player:GetName(), "r")
 			if PlayerPass then
-				if PlayerPass == md5(Split[2]) then
+				local line = PlayerPass:read("*all")
+				if line == md5(Split[2]) then
 					Auth[Player:GetName()] = true
 					Player:SendMessage(cChatColor.LightGreen .. "You are logged in")
 					Player:LoadPermissionsFromDisk()
 					Player:TeleportTo( X[Player:GetName()], Y[Player:GetName()], Z[Player:GetName()] )
-					else
-						Count[Player:GetName()] = Count[Player:GetName()] - 1
-						Player:SendMessage(cChatColor.Rose .. "Wrong Password, You have " .. Count[Player:GetName()] .. " tries left")
-					if Count[Player:GetName()] == 0 then
-						Player:TeleportTo( X[Player:GetName()], Y[Player:GetName()], Z[Player:GetName()] )
-						local ClientHandle = Player:GetClientHandle()
-						ClientHandle:Kick( "You used a wrong password too many times" )
-					end
+				else
+					Count[Player:GetName()] = Count[Player:GetName()] - 1
+					Player:SendMessage(cChatColor.Rose .. "Wrong Password, You have " .. Count[Player:GetName()] .. " tries left")
+				if Count[Player:GetName()] == 0 then
+					Player:TeleportTo( X[Player:GetName()], Y[Player:GetName()], Z[Player:GetName()] )
+					local ClientHandle = Player:GetClientHandle()
+					ClientHandle:Kick( "You used a wrong password too many times" )
 				end
-			--PlayerPass:close
-			end					
-		end		
+			end
+			PlayerPass:close()
+		end
+	end             
 	else
 		Player:SendMessage(cChatColor.LightGreen .. "You are already logged in")
 	end
 	return true
 end
+
 
 function HandleRegisterCommand( Split, Player )
 	if (Split[2] == nil) then
