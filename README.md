@@ -12,11 +12,11 @@ The installation for Login is simple, just follow these steps:
  * Unzip the zip into your MCServer plugins folder.
  * In the plugins section of your `settings.ini` file, add the following line: `Plugin=Login`.
  * Add the following permissions to your default group in groups.ini:
- * * login.register
- * * login.login
- * * login.changepass
- * * login.removeacc
- * * login.logout
+   * login.register
+   * login.login
+   * login.changepass
+   * login.removeacc
+   * login.logout
  * You have now installed Login for MCServer!
 
 Configuration
