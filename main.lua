@@ -14,12 +14,13 @@ Count = {}
 PlayerGM = {}
 PlayerMSG= {}
 function Initialize( Plugin )
-  PLUGIN = Plugin
+
+	PLUGIN = Plugin
 	
 	Plugin:SetName( "Login" )
 	Plugin:SetVersion( 1 )
        
-    PluginManager = cRoot:Get():GetPluginManager()
+	PluginManager = cRoot:Get():GetPluginManager()
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_DISCONNECT)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHAT)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_TOSSING_ITEM)
