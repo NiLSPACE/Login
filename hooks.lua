@@ -22,17 +22,17 @@ end
 
 function OnPlayerTossingItem(Player)
 	if Auth[Player:GetName()] == false then
-		Player:SendMessage(cChatColor.Rose .. "Please log in before tossing items")
+		Player:SendMessage(cChatColor.Rose .. TossingItem)
 		return true
 	end
 end
 
 function OnLogin(Client, ProtocolVersion, Username)
-	local loopPlayers = function( PlayerNew )
-        if(PlayerNew:GetName() == Username) then
-            PlayerNew:SendMessage( "Somebody just tried to login in under your name." )
-            Client:Kick( "[Server] Already ingame." )
-        end
+	local loopPlayers = function( NewPlayer )
+		if (NewPlayer:GetName() == Username) then
+			NewPlayer:SendMessage( "Somebody just tried to login in under your name." )
+			Client:Kick( "Server Reloaded" )
+		end
     end
     local loopWorlds = function ( World )
         World:ForEachPlayer( loopPlayers )
@@ -47,7 +47,7 @@ end
 
 function OnChat(Player)
 	if Auth[Player:GetName()] == false then
-		Player:SendMessage(cChatColor.Rose .. "Please log in before you start talking")
+		Player:SendMessage(cChatColor.Rose .. OnPlayerChat)
 		return true
 	end
 end
@@ -58,10 +58,10 @@ function OnPlayerMoving(Player)
 		PlayerMSG[Player:GetName()] = PlayerMSG[Player:GetName()] + 1
 		if PlayerMSG[Player:GetName()] == 60 then
 			if AuthDir[Player:GetName()] then
-				Player:SendMessage(cChatColor.Rose .. "Please log in using /login (password)")
+				Player:SendMessage(cChatColor.Rose .. NotLoggedIn)
 				PlayerMSG[Player:GetName()] = 1
 			else
-				Player:SendMessage(cChatColor.Rose .. "Please register using /register (password)")
+				Player:SendMessage(cChatColor.Rose .. NotRegistered)
 				PlayerMSG[Player:GetName()] = 1
 			end
 		end
@@ -71,14 +71,14 @@ end
 
 function OnPlayerLeftClick(Player)
 	if Auth[Player:GetName()] == false then
-		Player:SendMessage(cChatColor.Rose .. "Please log in before breaking blocks")
+		Player:SendMessage(cChatColor.Rose .. OnBreaking)
 		return true
 	end
 end
 
 function OnPlayerRightClick(Player)
 	if Auth[Player:GetName()] == false then
-		Player:SendMessage(cChatColor.Rose .. "Please log in before placing blocks")
+		Player:SendMessage(cChatColor.Rose .. OnPlacing)
 		return true
 	end
 end
@@ -93,8 +93,8 @@ function OnPlayerJoined(Player)
 	AuthDir[Player:GetName()] = io.open(PluginDir .. "Players/" .. Player:GetName(), "r" )
 	if AuthDir[Player:GetName()] then
 		AuthDir[Player:GetName()]:close()
-		Player:SendMessage(cChatColor.Rose .. "Please use /login (Password) to login")
+		Player:SendMessage(cChatColor.Rose .. NotLoggedIn)
 	else		
-		Player:SendMessage(cChatColor.LightGreen .. "Please register using: /register (password)")
+		Player:SendMessage(cChatColor.LightGreen .. NotRegistered)
 	end
 end
