@@ -1,10 +1,5 @@
 -- Author STR_Warrior --
 
---Settings--
-Tries = 3 -- how many times may someone type the wrong password
-Ban = true
---Settings
-
 AuthDir = {}
 Auth = {}
 X = {}
@@ -19,7 +14,6 @@ PlayerMSG= {}
 function Initialize( Plugin )
 
 	PLUGIN = Plugin
-	
 	Plugin:SetName( "Login" )
 	Plugin:SetVersion( 1 )
        
@@ -40,6 +34,7 @@ function Initialize( Plugin )
 	PluginManager:BindCommand("/logout",			"login.logout", 		HandleLogoutCommand,			" - Logs you out your account");
 	PluginManager:BindCommand("/removeacc", 		"login.removeacc", 		HandleRemoveAccountCommand, 	" - Removes a account");
 	PluginDir = Plugin:GetLocalDirectory() .. "/"
+	LoadSettings()
 	LOG( "Initialized " .. Plugin:GetName() .. " v" .. Plugin:GetVersion() )
 	return true
 end
