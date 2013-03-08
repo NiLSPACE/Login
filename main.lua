@@ -15,7 +15,7 @@ function Initialize( Plugin )
 
 	PLUGIN = Plugin
 	Plugin:SetName( "Login" )
-	Plugin:SetVersion( 1 )
+	Plugin:SetVersion( 2 )
        
 	PluginManager = cRoot:Get():GetPluginManager()
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_DISCONNECT)
