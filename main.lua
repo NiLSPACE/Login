@@ -15,7 +15,7 @@ function Initialize( Plugin )
 
 	PLUGIN = Plugin
 	Plugin:SetName( "Login" )
-	Plugin:SetVersion( 2 )
+	Plugin:SetVersion( 3 )
        
 	PluginManager = cRoot:Get():GetPluginManager()
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_DISCONNECT)
@@ -24,9 +24,10 @@ function Initialize( Plugin )
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_JOINED)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_LEFT_CLICK)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_RIGHT_CLICK)
-	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_MOVING)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_LOGIN)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_EXECUTE_COMMAND)
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_TAKE_DAMAGE)
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_TICK)
 	
 	PluginManager:BindCommand("/changepass", 		"login.changepass", 	HandleChangePasswordCommand,		" - Change you password");
 	PluginManager:BindCommand("/register",            "login.register",            HandleRegisterCommand,            " - Register your account");
@@ -34,6 +35,7 @@ function Initialize( Plugin )
 	PluginManager:BindCommand("/logout",			"login.logout", 		HandleLogoutCommand,			" - Logs you out your account");
 	PluginManager:BindCommand("/removeacc", 		"login.removeacc", 		HandleRemoveAccountCommand, 	" - Removes a account");
 	PluginDir = Plugin:GetLocalDirectory() .. "/"
+	LoadOnlinePlayers()
 	LoadSettings()
 	LOG( "Initialized " .. Plugin:GetName() .. " v" .. Plugin:GetVersion() )
 	return true
@@ -42,8 +44,10 @@ end
 
 function OnDisable()
     local loopPlayers = function( Player )
+		if Auth[Player:GetName()] == false then
 			local ClientHandle = Player:GetClientHandle()
-			ClientHandle:Kick( "Server Reloaded" )
+			ClientHandle:Kick( cChatColor.Rose .. ReloadKick )
+		end
     end
     local loopWorlds = function ( World )
         World:ForEachPlayer( loopPlayers )
