@@ -20,7 +20,16 @@ function LoadSettings()
 	AlreadyRegistered = 			Settings:GetValueSet("Messages","AlreadyRegistered","you already have registered")
 	Registered = 					Settings:GetValueSet("Messages","Registered","You have registered")
 	RemoveAcc = 					Settings:GetValueSet("Messages","RemoveAcc","Usage: /removeacc (player)")
-	LOG(LoginMessage)
-	LOG(LoginNotRegistered)
+	ReloadKick = 					Settings:GetValueSet("Kick","Reload","The server was reloaded while you were not logged in.")
 	Settings:WriteFile()
+end
+
+function LoadOnlinePlayers()
+    local loopPlayers = function( Player )
+		Auth[Player:GetName()] = true
+    end
+    local loopWorlds = function ( World )
+        World:ForEachPlayer( loopPlayers )
+    end
+    cRoot:Get():ForEachWorld( loopWorlds )
 end
