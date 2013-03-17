@@ -52,23 +52,6 @@ function OnChat(Player)
 	end
 end
 
-function OnPlayerMoving(Player)
-	World = Player:GetWorld()
-	if Auth[Player:GetName()] == false then
-		PlayerMSG[Player:GetName()] = PlayerMSG[Player:GetName()] + 1
-		if PlayerMSG[Player:GetName()] == 60 then
-			if AuthDir[Player:GetName()] then
-				Player:SendMessage(cChatColor.Rose .. NotLoggedIn)
-				PlayerMSG[Player:GetName()] = 1
-			else
-				Player:SendMessage(cChatColor.Rose .. NotRegistered)
-				PlayerMSG[Player:GetName()] = 1
-			end
-		end
-		Player:TeleportTo( World:GetSpawnX(), World:GetSpawnY(), World:GetSpawnZ() )
-	end
-end
-
 function OnPlayerLeftClick(Player)
 	if Auth[Player:GetName()] == false then
 		Player:SendMessage(cChatColor.Rose .. OnBreaking)
@@ -97,4 +80,35 @@ function OnPlayerJoined(Player)
 	else		
 		Player:SendMessage(cChatColor.LightGreen .. NotRegistered)
 	end
+end
+
+function OnTakeDamage(Receiver, TDI)
+	if Receiver:IsPlayer() == true then
+		if Auth[Receiver:GetName()] == false then
+			TDI.FinalDamage = 0
+		end
+	end
+end
+
+function OnTick()
+	local loopPlayers = function( Player )
+		World = Player:GetWorld()
+		if Auth[Player:GetName()] == false then
+			PlayerMSG[Player:GetName()] = PlayerMSG[Player:GetName()] + 1
+			if PlayerMSG[Player:GetName()] == 60 then
+				if AuthDir[Player:GetName()] then
+					Player:SendMessage(cChatColor.Rose .. NotLoggedIn)
+					PlayerMSG[Player:GetName()] = 1
+				else
+					Player:SendMessage(cChatColor.Rose .. NotRegistered)
+					PlayerMSG[Player:GetName()] = 1
+				end
+			end
+			Player:TeleportTo( World:GetSpawnX(), World:GetSpawnY(), World:GetSpawnZ() )
+		end
+	end
+	local loopWorlds = function ( World )
+		World:ForEachPlayer( loopPlayers )
+	end
+	cRoot:Get():ForEachWorld( loopWorlds )
 end
