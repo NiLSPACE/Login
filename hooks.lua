@@ -27,16 +27,18 @@ function OnPlayerTossingItem(Player)
 	end
 end
 
-function OnLogin(Client, ProtocolVersion, Username)
-	local loopPlayers = function( NewPlayer )
-		if (NewPlayer:GetName() == Username) then
-			NewPlayer:SendMessage( "Somebody just tried to login in under your name." )
-			Client:Kick( "Server Reloaded" )
+function OnHandshake(ClientHandle, UserName)	
+	local loopPlayers = function( Player )
+		if (Player:GetName() == UserName) then
+			Player:SendMessage( "Somebody just tried to login in under your name." )
+			ClientHandle:Kick("There is already somebody with that name")
+			return true
 		end
     end
     local loopWorlds = function ( World )
         World:ForEachPlayer( loopPlayers )
     end
+	cRoot:Get():ForEachWorld( loopWorlds )
 end
 
 function OnDisconnect(Player)
@@ -95,7 +97,7 @@ function OnTick()
 		World = Player:GetWorld()
 		if Auth[Player:GetName()] == false then
 			PlayerMSG[Player:GetName()] = PlayerMSG[Player:GetName()] + 1
-			if PlayerMSG[Player:GetName()] == 60 then
+			if PlayerMSG[Player:GetName()] == 40 then
 				if AuthDir[Player:GetName()] then
 					Player:SendMessage(cChatColor.Rose .. NotLoggedIn)
 					PlayerMSG[Player:GetName()] = 1
