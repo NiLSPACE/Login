@@ -15,7 +15,7 @@ function Initialize( Plugin )
 
 	PLUGIN = Plugin
 	Plugin:SetName( "Login" )
-	Plugin:SetVersion( 3 )
+	Plugin:SetVersion( 3.1 )
        
 	PluginManager = cRoot:Get():GetPluginManager()
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_DISCONNECT)
@@ -24,7 +24,7 @@ function Initialize( Plugin )
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_JOINED)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_LEFT_CLICK)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_RIGHT_CLICK)
-	PluginManager:AddHook(Plugin, cPluginManager.HOOK_LOGIN)
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_HANDSHAKE)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_EXECUTE_COMMAND)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_TAKE_DAMAGE)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_TICK)
