@@ -4,6 +4,8 @@ function LoadSettings()
   Settings = cIniFile(PLUGIN:GetLocalDirectory() .."/Config.ini")
 	Settings:ReadFile()
 	Tries = 						Settings:GetValueSetI("Settings","Tries", 			3)
+	Storage = 						Settings:GetValueSet("Settings", "Storage", "Ini")
+									Settings:KeyComment("Settings", 'There are 2 storage types. the "Old" and the new "Ini" ')
 	NotRegistered = 				Settings:GetValueSet("Messages","NotRegistered", 	"Please register using /register (password)")
 	NotLoggedIn = 					Settings:GetValueSet("Messages","NotLoggedIn", 	"Please log in using /login (password)")
 	TossingItem = 					Settings:GetValueSet("Messages","TossingItem", 	"Please log in before tossing items")
@@ -20,6 +22,8 @@ function LoadSettings()
 	AlreadyRegistered = 			Settings:GetValueSet("Messages","AlreadyRegistered","you already have registered")
 	Registered = 					Settings:GetValueSet("Messages","Registered","You have registered")
 	RemoveAcc = 					Settings:GetValueSet("Messages","RemoveAcc","Usage: /removeacc (player)")
+	DeleteNoAccount = 				Settings:GetValueSet("Messages","NoDeleteAccount","Acount does not exist")
+	AccountRemoved = 				Settings:GetValueSet("Messages","AccountRemoved","Account Removed")
 	ReloadKick = 					Settings:GetValueSet("Kick","Reload","The server was reloaded while you were not logged in.")
 	Settings:WriteFile()
 end
@@ -32,4 +36,10 @@ function LoadOnlinePlayers()
         World:ForEachPlayer( loopPlayers )
     end
     cRoot:Get():ForEachWorld( loopWorlds )
+end
+
+function LoadPasswords()
+	PassIni = cIniFile(PLUGIN:GetLocalDirectory() .. "/Players.ini")
+	PassIni:ReadFile()
+	PassIni:WriteFile()
 end
