@@ -7,15 +7,27 @@ function OnExecuteCommand(Player, CommandSplit)
 	if (Auth[Player:GetName()] == true) then
 		return false;
 	end
+	if Storage ~= "Ini" then
 		AuthDir[Player:GetName()] = io.open(PluginDir .. "Players/" .. Player:GetName(), "r" )
-	if 	AuthDir[Player:GetName()] then
-		AuthDir[Player:GetName()]:close()
-		if (CommandSplit[1] ~= "/login") then 
-			return true
+		if 	AuthDir[Player:GetName()] then
+			AuthDir[Player:GetName()]:close()
+			if (CommandSplit[1] ~= "/login") then 
+				return true
+			end
+		else		
+			if (CommandSplit[1] ~= "/register") then
+				return true
+			end
 		end
-	else		
-		if (CommandSplit[1] ~= "/register") then
-			return true
+	else
+		if PassIni:FindKey(Player:GetName()) ~= -1 then
+			if (CommandSplit[1] ~= "/login") then 
+				return true
+			end
+		else		
+			if (CommandSplit[1] ~= "/register") then
+				return true
+			end 
 		end
 	end
 end
@@ -75,12 +87,20 @@ function OnPlayerJoined(Player)
 	Y[Player:GetName()] = Player:GetPosY()
 	Z[Player:GetName()] = Player:GetPosZ()
 	Auth[Player:GetName()] = false
-	AuthDir[Player:GetName()] = io.open(PluginDir .. "Players/" .. Player:GetName(), "r" )
-	if AuthDir[Player:GetName()] then
-		AuthDir[Player:GetName()]:close()
-		Player:SendMessage(cChatColor.Rose .. NotLoggedIn)
-	else		
-		Player:SendMessage(cChatColor.LightGreen .. NotRegistered)
+	if Storage ~= "Ini" then
+		AuthDir[Player:GetName()] = io.open(PluginDir .. "Players/" .. Player:GetName(), "r" )
+		if AuthDir[Player:GetName()] then
+			AuthDir[Player:GetName()]:close()
+			Player:SendMessage(cChatColor.Rose .. NotLoggedIn)
+		else		
+			Player:SendMessage(cChatColor.LightGreen .. NotRegistered)
+		end
+	else
+		if PassIni:FindKey(Player:GetName()) ~= -1 then
+			Player:SendMessage(cChatColor.Rose .. NotLoggedIn)
+		else
+			Player:SendMessage(cChatColor.LightGreen .. NotRegistered)
+		end
 	end
 end
 
@@ -98,12 +118,22 @@ function OnTick()
 		if Auth[Player:GetName()] == false then
 			PlayerMSG[Player:GetName()] = PlayerMSG[Player:GetName()] + 1
 			if PlayerMSG[Player:GetName()] == 40 then
-				if AuthDir[Player:GetName()] then
-					Player:SendMessage(cChatColor.Rose .. NotLoggedIn)
-					PlayerMSG[Player:GetName()] = 1
+				if Storage ~= "Ini" then
+					if AuthDir[Player:GetName()] then
+						Player:SendMessage(cChatColor.Rose .. NotLoggedIn)
+						PlayerMSG[Player:GetName()] = 1
+					else
+						Player:SendMessage(cChatColor.Rose .. NotRegistered)
+						PlayerMSG[Player:GetName()] = 1
+					end
 				else
-					Player:SendMessage(cChatColor.Rose .. NotRegistered)
-					PlayerMSG[Player:GetName()] = 1
+					if PassIni:FindKey(Player:GetName()) == -1 then
+						Player:SendMessage(cChatColor.Rose .. NotRegistered)
+						PlayerMSG[Player:GetName()] = 1
+					else
+						Player:SendMessage(cChatColor.Rose .. NotLoggedIn)
+						PlayerMSG[Player:GetName()] = 1
+					end
 				end
 			end
 			Player:TeleportTo( World:GetSpawnX(), World:GetSpawnY(), World:GetSpawnZ() )
