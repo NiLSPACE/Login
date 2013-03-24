@@ -15,7 +15,7 @@ function Initialize( Plugin )
 
 	PLUGIN = Plugin
 	Plugin:SetName( "Login" )
-	Plugin:SetVersion( 3.1 )
+	Plugin:SetVersion( 4 )
        
 	PluginManager = cRoot:Get():GetPluginManager()
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_DISCONNECT)
@@ -37,6 +37,9 @@ function Initialize( Plugin )
 	PluginDir = Plugin:GetLocalDirectory() .. "/"
 	LoadOnlinePlayers()
 	LoadSettings()
+	if Storage == "Ini" then
+		LoadPasswords()
+	end
 	LOG( "Initialized " .. Plugin:GetName() .. " v" .. Plugin:GetVersion() )
 	return true
 end
