@@ -22,4 +22,4 @@ The installation for Login is simple, just follow these steps:
 Configuration
 -------------
 
-The configuration file for Login is located inside its folder in the Plugins folder. Simple edit `main.lua` and the configuration is at the top.
+The configuration file for Login is located inside its folder in the Plugins folder. Simple edit `Config.Ini` and the configuration is at the top.
