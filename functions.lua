@@ -3,9 +3,10 @@
 function LoadSettings()
   Settings = cIniFile(PLUGIN:GetLocalDirectory() .."/Config.ini")
 	Settings:ReadFile()
+									Settings:DeleteKeyComments("Settings") 
+									Settings:KeyComment("Settings", 'There are 2 storage types. the "Old" and the new "Ini" ')
 	Tries = 						Settings:GetValueSetI("Settings","Tries", 			3)
 	Storage = 						Settings:GetValueSet("Settings", "Storage", "Ini")
-									Settings:KeyComment("Settings", 'There are 2 storage types. the "Old" and the new "Ini" ')
 	NotRegistered = 				Settings:GetValueSet("Messages","NotRegistered", 	"Please register using /register (password)")
 	NotLoggedIn = 					Settings:GetValueSet("Messages","NotLoggedIn", 	"Please log in using /login (password)")
 	TossingItem = 					Settings:GetValueSet("Messages","TossingItem", 	"Please log in before tossing items")
@@ -26,6 +27,11 @@ function LoadSettings()
 	AccountRemoved = 				Settings:GetValueSet("Messages","AccountRemoved","Account Removed")
 	ReloadKick = 					Settings:GetValueSet("Kick","Reload","The server was reloaded while you were not logged in.")
 	Settings:WriteFile()
+end
+
+function InitConsoleCommands()
+	local PluginMgr = cPluginManager:Get();
+	PluginMgr:BindConsoleCommand("managelogin",                 HandleConsoleCommand,                 "Manage the login plugin");
 end
 
 function LoadOnlinePlayers()

@@ -15,7 +15,7 @@ function Initialize( Plugin )
 
 	PLUGIN = Plugin
 	Plugin:SetName( "Login" )
-	Plugin:SetVersion( 4 )
+	Plugin:SetVersion( 5 )
        
 	PluginManager = cRoot:Get():GetPluginManager()
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_DISCONNECT)
@@ -29,17 +29,22 @@ function Initialize( Plugin )
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_TAKE_DAMAGE)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_TICK)
 	
-	PluginManager:BindCommand("/changepass", 		"login.changepass", 	HandleChangePasswordCommand,		" - Change you password");
-	PluginManager:BindCommand("/register",            "login.register",            HandleRegisterCommand,            " - Register your account");
-	PluginManager:BindCommand("/login",            "login.login",            HandleLoginCommand,            " - Logs you into your account");
-	PluginManager:BindCommand("/logout",			"login.logout", 		HandleLogoutCommand,			" - Logs you out your account");
-	PluginManager:BindCommand("/removeacc", 		"login.removeacc", 		HandleRemoveAccountCommand, 	" - Removes a account");
+	PluginManager:BindCommand("/changepass",       "login.changepass", 	 HandleChangePasswordCommand,	   " - Change you password");
+	PluginManager:BindCommand("/register",         "login.register",     HandleRegisterCommand,            " - Register your account");
+	PluginManager:BindCommand("/login",            "login.login",        HandleLoginCommand,               " - Logs you into your account");
+	PluginManager:BindCommand("/logout",           "login.logout", 	     HandleLogoutCommand,              " - Logs you out your account");
+	PluginManager:BindCommand("/removeacc",        "login.removeacc",    HandleRemoveAccountCommand,       " - Removes a account");
+	
 	PluginDir = Plugin:GetLocalDirectory() .. "/"
+	InitConsoleCommands();
 	LoadOnlinePlayers()
 	LoadSettings()
 	if Storage == "Ini" then
 		LoadPasswords()
 	end
+	
+	PLUGIN:AddWebTab("Manage Login",   HandleRequest_Login);
+	
 	LOG( "Initialized " .. Plugin:GetName() .. " v" .. Plugin:GetVersion() )
 	return true
 end

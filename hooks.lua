@@ -86,7 +86,17 @@ function OnPlayerJoined(Player)
 	X[Player:GetName()] = Player:GetPosX()
 	Y[Player:GetName()] = Player:GetPosY()
 	Z[Player:GetName()] = Player:GetPosZ()
-	Auth[Player:GetName()] = false
+	if tDisable == true then
+		Auth[Player:GetName()] = true
+		tDisable = false
+		return false
+	end
+	if Disable == true then
+		Auth[Player:GetName()] = true
+		return false
+	else
+		Auth[Player:GetName()] = false
+	end
 	if Storage ~= "Ini" then
 		AuthDir[Player:GetName()] = io.open(PluginDir .. "Players/" .. Player:GetName(), "r" )
 		if AuthDir[Player:GetName()] then
