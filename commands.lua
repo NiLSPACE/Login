@@ -18,8 +18,6 @@ function HandleChangePasswordCommand( Split, Player)
 					Player:SendMessage(cChatColor.Rose .. ChangePasswordWrong)
 				end
 			else
-				LOG(md5(Split[2]))
-				LOG( PassIni:GetValue(Player:GetName(), "Password") )
 				if PassIni:GetValue(Player:GetName(), "Password") == md5(Split[2]) then
 					PassIni:DeleteKey(Player:GetName())
 					PassIni:SetValue(Player:GetName(), "Password", md5(Split[3]))
