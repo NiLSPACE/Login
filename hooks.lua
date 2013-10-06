@@ -146,7 +146,7 @@ function OnTick()
 					end
 				end
 			end
-			Player:TeleportTo( World:GetSpawnX(), World:GetSpawnY(), World:GetSpawnZ() )
+			Player:TeleportToCoords( World:GetSpawnX(), World:GetSpawnY(), World:GetSpawnZ() )
 		end
 	end
 	local loopWorlds = function ( World )
