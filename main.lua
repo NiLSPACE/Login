@@ -1,65 +1,145 @@
--- Author STR_Warrior --
+--[[Created by STR_Warrior]]--
 
-AuthDir = {}
-Auth = {}
-X = {}
-Y = {}
-Z = {}
-Count = {}
-PlayerGM = {}
-PlayerMSG= {}
+PassWords = nil
+IsAuthedWebAdmin = {}
+IsAuthed = {}
+PlayerPos = {}
 
--- Code Start
+Ticks = 0
 
-function Initialize( Plugin )
-
+function Initialize(Plugin)
 	PLUGIN = Plugin
-	Plugin:SetName( "Login" )
-	Plugin:SetVersion( 5 )
-       
-	PluginManager = cRoot:Get():GetPluginManager()
-      PluginManager.AddHook( cPluginManager.HOOK_CHAT, OnChat )
-      PluginManager.AddHook( cPluginManager.HOOK_PLAYER_TOSSING_ITEM, OnPlayerTossingItem )
-	PluginManager.AddHook( cPluginManager.HOOK_DISCONNECT, OnDisconnect )
-	PluginManager.AddHook( cPluginManager.HOOK_PLAYER_LEFT_CLICK, OnPlayerLeftClick )
-	PluginManager.AddHook( cPluginManager.HOOK_PLAYER_JOINED, OnPlayerJoined )
-	PluginManager.AddHook( cPluginManager.HOOK_TICK, OnTick )
-	PluginManager.AddHook( cPluginManager.HOOK_PLAYER_RIGHT_CLICK, OnPlayerRightClick )
-      PluginManager.AddHook( cPluginManager.HOOK_TAKE_DAMAGE, OnTakeDamage)
-	PluginManager.AddHook( cPluginManager.HOOK_EXECUTE_COMMAND, OnExecuteCommand )
-      PluginManager.AddHook( cPluginManager.HOOK_HANDSHAKE, OnHandshake)
+	Plugin:SetVersion(1)
+	Plugin:SetName("Login")
 	
-	PluginManager:BindCommand("/changepass",       "login.changepass", 	 HandleChangePasswordCommand,	   " - Change you password");
-	PluginManager:BindCommand("/register",         "login.register",     HandleRegisterCommand,            " - Register your account");
-	PluginManager:BindCommand("/login",            "login.login",        HandleLoginCommand,               " - Logs you into your account");
-	PluginManager:BindCommand("/logout",           "login.logout", 	     HandleLogoutCommand,              " - Logs you out your account");
-	PluginManager:BindCommand("/removeacc",        "login.removeacc",    HandleRemoveAccountCommand,       " - Removes a account");
+	LoadSettings(PLUGIN:GetLocalFolder() .. "/Config.ini")
 	
-	PluginDir = Plugin:GetLocalDirectory() .. "/"
-	InitConsoleCommands();
-	LoadOnlinePlayers()
-	LoadSettings()
-	if Storage == "Ini" then
-		LoadPasswords()
-	end
+	cPluginManager.AddHook(cPluginManager.HOOK_DISCONNECT, OnDisconnect)
+	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_JOINED, OnPlayerJoined)
+	cPluginManager.AddHook(cPluginManager.HOOK_HANDSHAKE, OnHandshake)
+	cPluginManager.AddHook(cPluginManager.HOOK_TAKE_DAMAGE, OnTakeDamage)
+	cPluginManager.AddHook(cPluginManager.HOOK_EXECUTE_COMMAND, OnExecuteCommand)
+	cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChat)
+	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_MOVING, OnPlayerMoving)
 	
-	PLUGIN:AddWebTab("Manage Login",   HandleRequest_Login);
+	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_RIGHT_CLICK, OnRightClick)
+	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_LEFT_CLICK, OnLeftClick)
 	
-	LOG( "Initialized " .. Plugin:GetName() .. " v" .. Plugin:GetVersion() )
+	local PluginManager = cRoot:Get():GetPluginManager()
+	PluginManager:BindCommand("/register",      "login.register",    HandleRegisterCommand,    " - Used to create an account in the Login plugin")
+	PluginManager:BindCommand("/login",         "login.login",       HandleLoginCommand,       " - Used to login in the Login plugin")
+	PluginManager:BindCommand("/changepass",    "login.changepass",  HandleChangePassCommand,  " - Used to change your password")
+	PluginManager:BindCommand("/logout",        "login.logout",      HandleLogoutCommand,      " - Used to logout")
+	PluginManager:BindCommand("/removeacc",     "login.removeacc",   HandleRemoveAccCommand,   " - Used to remove an account from the Login plugin")
+	PluginManager:BindConsoleCommand("removeacc",              HandleConsoleRemoveAccCommand,  " - Used to remove an account from the Login plugin")
+	
+	cRoot:Get():ForEachPlayer(function(Player)
+		IsAuthed[Player:GetName()] = true
+	end)
+	
+	PassWords = LoadPasswords(PLUGIN:GetLocalFolder() .. "/Passwords.txt")
+	
+	Plugin:AddWebTab("Manage Plugin", HandleRequest_ManageAccs)
+	
 	return true
 end
 
-
 function OnDisable()
-    local loopPlayers = function( Player )
-		if Auth[Player:GetName()] == false then
-			local ClientHandle = Player:GetClientHandle()
-			ClientHandle:Kick( cChatColor.Rose .. ReloadKick )
+	cRoot:Get():ForEachPlayer(function(Player)
+		if not IsAuthed[Player:GetName()] then
+			Player:GetClientHandle():Kick("There was a reload and you were not logged in")
 		end
-    end
-    local loopWorlds = function ( World )
-        World:ForEachPlayer( loopPlayers )
-    end
-    cRoot:Get():ForEachWorld( loopWorlds )
-	LOG(PLUGIN:GetName() .." v".. PLUGIN:GetVersion() .." is shutting down")
+	end)
+	PassWords:Save()
+end
+
+function LoadPasswords(Path)
+	local File = io.open(Path)
+	local Table = {}
+	if File then
+		for I in File:lines() do
+			local Split = StringSplit(I, ";")
+			Table[Split[1]] = Split[2]
+		end
+		File:close()
+	else
+		local File = io.open(Path, "w")
+		File:write()
+		File:close()
+	end
+	local Object = {}
+	function Object:GetPassFromPlayer(PlayerName)
+		if Table[PlayerName] ~= nil then
+			return true, Table[PlayerName]
+		end
+		return false
+	end
+	
+	function Object:AddPass(PlayerName, Password)
+		if Table[PlayerName] == nil then
+			Table[PlayerName] = md5(Password)
+			return true
+		end
+		return false
+	end
+	
+	function Object:RemovePlayer(PlayerName)
+		if Table[PlayerName] ~= nil then
+			Table[PlayerName] = nil
+			return true
+		end
+		return false
+	end
+	
+	function Object:ChangePass(PlayerName, NewPassword)
+		if Table[PlayerName] ~= nil then
+			Table[PlayerName] = md5(NewPassword)
+			return true
+		end
+		return false
+	end
+	
+	function Object:PlayerExists(PlayerName)
+		if Table[PlayerName] ~= nil then
+			return true
+		end
+		return false
+	end
+	
+	function Object:ReturnTable()
+		return Table
+	end
+	
+	function Object:Save()
+		local File = io.open(Path, "w")
+		for I, k in pairs(Table) do
+			File:write(I .. ";" .. k .. "\n")
+		end
+		File:close()
+	end
+	return Object
+end
+
+function Logout(Player)
+	local PlayerName = Player:GetName()
+	local World = Player:GetWorld()
+	PlayerPos[PlayerName] = Vector3d(Player:GetPosX(), Player:GetPosY(), Player:GetPosZ())
+	Player:TeleportToCoords(World:GetSpawnX(), World:GetSpawnY(), World:GetSpawnZ())
+	IsAuthed[PlayerName] = false
+	Player:SendMessage(cChatColor.LightGreen .. "You logged out")
+end
+
+function Login(Player)
+	local PlayerName = Player:GetName()
+	IsAuthed[PlayerName] = true
+	Player:TeleportToCoords(PlayerPos[PlayerName].x, PlayerPos[PlayerName].y, PlayerPos[PlayerName].z)
+	Player:SendMessage(cChatColor.LightGreen .. "You are now logged in")
+end
+
+function LoadSettings(Path)
+	local SettingsIni = cIniFile()
+	SettingsIni:ReadFile(Path)
+	WebAdminPasswordOn = SettingsIni:GetValueSetB("WebAdmin", "WebAdminPasswordOn", false)
+	WebAdminPassword = SettingsIni:GetValueSet("WebAdmin", "WebAdminPassword", "Password")
+	SettingsIni:WriteFile(Path)
 end

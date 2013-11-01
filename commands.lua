@@ -1,151 +1,93 @@
--- Author STR_Warrior --
+--[[Created by STR_Warrior]]--
 
-function HandleChangePasswordCommand( Split, Player)
-	if Auth[Player:GetName()] == true then
-		if (Split[2] == nil) then
-			Player:SendMessage(cChatColor.LightGreen .. ChangePassword)
-		else
-			if Storage ~= "Ini" then
-				PlayerPass = (io.open(PluginDir .. "Players/" .. Player:GetName(), "r"))
-				Password = (io.lines(PluginDir .. "Players/" .. Player:GetName()))
-				if Password() == md5(Split[2]) then
-					os.remove(PluginDir .. "Players/" .. Player:GetName())
-					AuthDir[Player:GetName()] = io.open(PluginDir .. "Players/" .. Player:GetName(), "w" )
-					AuthDir[Player:GetName()]:write(md5(Split[3]))
-					AuthDir[Player:GetName()]:close()
-					Player:SendMessage(cChatColor.LightGreen .. "Password changed to " .. Split[3])
-				else
-					Player:SendMessage(cChatColor.Rose .. ChangePasswordWrong)
-				end
-			else
-				if PassIni:GetValue(Player:GetName(), "Password") == md5(Split[2]) then
-					PassIni:DeleteKey(Player:GetName())
-					PassIni:SetValue(Player:GetName(), "Password", md5(Split[3]))
-					PassIni:WriteFile()
-					Player:SendMessage(cChatColor.LightGreen .. "Password changed to " .. Split[3])
-				else
-					Player:SendMessage(cChatColor.Rose .. ChangePasswordWrong)
-				end
-			end
-		end
+function HandleRegisterCommand(Split, Player)
+	local PlayerName = Player:GetName()
+	if IsAuthed[PlayerName] then
+		Player:SendMessage(cChatColor.LightGreen .. "You are already logged in")
+		return true
 	end
-	return true
-end
-			
-function HandleLogoutCommand( Split, Player )
-	PlayerMSG[Player:GetName()] = -99999999999999999999999999
-	X[Player:GetName()] = Player:GetPosX()
-	Y[Player:GetName()] = Player:GetPosY()
-	Z[Player:GetName()] = Player:GetPosZ()
-	Count[Player:GetName()] = Tries
-	Auth[Player:GetName()] = false
-	Player:SendMessage(cChatColor.LightGreen .. Logout)
-	Count[Player:GetName()] = Tries
+	if (#Split ~= 3) or (Split[2] ~= Split[3]) then
+		Player:SendMessage(cChatColor.Rose .. "Usage: /register [Password] [ConfirmationPassword]")
+		return true
+	end
+	PassWords:AddPass(PlayerName, Split[2])
+	Player:TeleportToCoords(PlayerPos[PlayerName].x, PlayerPos[PlayerName].y, PlayerPos[PlayerName].z)
+	IsAuthed[PlayerName] = true
+	Player:SendMessage(cChatColor.LightGreen .. "You have registered")
 	return true
 end
 
-function HandleLoginCommand( Split, Player)
-	if Auth[Player:GetName()] == false then
-		if (Split[2] == nil) then
-			Player:SendMessage(cChatColor.LightGreen .. Login)
-		else
-			if Storage ~= "Ini" then
-				local PlayerPass = io.open(PluginDir .. "Players/" .. Player:GetName(), "r")
-				if PlayerPass then
-					local line = PlayerPass:read("*all")
-					if line == md5(Split[2]) then
-						Auth[Player:GetName()] = true
-						Player:SendMessage(cChatColor.LightGreen .. LoggedIn)
-						Player:LoadPermissionsFromDisk()
-						Player:TeleportTo( X[Player:GetName()], Y[Player:GetName()], Z[Player:GetName()] )
-					else
-						Count[Player:GetName()] = Count[Player:GetName()] - 1
-						Player:SendMessage(cChatColor.Rose .. "Wrong Password, You have " .. Count[Player:GetName()] .. " tries left")
-						if Count[Player:GetName()] == 0 then
-							Player:TeleportTo( X[Player:GetName()], Y[Player:GetName()], Z[Player:GetName()] )
-							local ClientHandle = Player:GetClientHandle()
-							ClientHandle:Kick( "You used a wrong password too many times" )
-						end
-					end
-				end
-				PlayerPass:close()
-			else
-				if PassIni:GetValue(Player:GetName(), "Password") == md5(Split[2]) then
-					Auth[Player:GetName()] = true
-					Player:SendMessage(cChatColor.LightGreen .. LoggedIn)
-					Player:LoadPermissionsFromDisk()
-					Player:TeleportTo( X[Player:GetName()], Y[Player:GetName()], Z[Player:GetName()] )
-				else
-					Count[Player:GetName()] = Count[Player:GetName()] - 1
-					Player:SendMessage(cChatColor.Rose .. "Wrong Password, You have " .. Count[Player:GetName()] .. " tries left")
-					if Count[Player:GetName()] == 0 then
-						Player:TeleportTo( X[Player:GetName()], Y[Player:GetName()], Z[Player:GetName()] )
-						local ClientHandle = Player:GetClientHandle()
-						ClientHandle:Kick( "You used a wrong password too many times" )
-					end
-				end	
-			end
-		end             
+function HandleLoginCommand(Split, Player)
+	local PlayerName = Player:GetName()
+	if IsAuthed[PlayerName] then
+		Player:SendMessage(cChatColor.LightGreen .. "You are already logged in")
+		return true
+	end
+	if #Split ~= 2 then
+		Player:SendMessage(cChatColor.Rose .. "Usage: /login [Password]")
+		return true
+	end
+	local Succes, Password = PassWords:GetPassFromPlayer(PlayerName)
+	if not Succes then
+		Player:SendMessage(cChatColor.Rose .. "You are not registered")
+		return true
+	end
+	if md5(Split[2]) ~= Password then
+		Player:SendMessage(cChatColor.Rose .. "Wrong password!")
+		return true
+	end
+	Login(Player)
+	
+	return true
+end
+
+function HandleChangePassCommand(Split, Player)
+	local PlayerName = Player:GetName()
+	if #Split ~= 3 then
+		Player:SendMessage(cChatColor.Rose .. "Usage: /changepass [OldPassword] [NewPassword]")
+		return true
+	end
+	local Succes, Password = PassWords:GetPassFromPlayer(PlayerName)
+	if not Succes then
+		Player:SendMessage(cChatColor.Rose .. "You are not registered. What happened here?")
+		return true
+	end
+	if md5(Split[2]) == Password then
+		PassWords:ChangePass(PlayerName, Split[3])
+		Player:SendMessage(cChatColor.LightGreen .. "You changed your password")
 	else
-		Player:SendMessage(cChatColor.LightGreen .. AlreadyLoggedIn)
+		Player:SendMessage(cChatColor.Rose .. "You entered the wrong password")
 	end
 	return true
 end
 
-
-function HandleRegisterCommand( Split, Player )
-	if (Split[2] == nil) then
-		Player:SendMessage(cChatColor.Rose .. Register)
-	else
-		if Storage ~= "Ini" then
-			AuthDir[Player:GetName()] = io.open(PluginDir .. "Players/" .. Player:GetName(), "r" )
-			if AuthDir[Player:GetName()] then
-				Player:SendMessage(cChatColor.Rose .. AlreadyRegistered)
-			else
-				Auth[Player:GetName()] = true
-				AuthDir[Player:GetName()] = io.open(PluginDir .. "Players/" .. Player:GetName(), "w" )
-				AuthDir[Player:GetName()]:write(md5(Split[2]))
-				AuthDir[Player:GetName()]:close()
-				Player:SendMessage(cChatColor.Green .. Registered)
-			end
-		else
-			if PassIni:FindKey(Player:GetName()) ~= -1 then
-				Player:SendMessage(cChatColor.Rose .. AlreadyRegistered)
-			else
-				PassIni:SetValue(Player:GetName(), "Password", md5(Split[2]))
-				PassIni:WriteFile()
-				Auth[Player:GetName()] = true
-				Player:SendMessage(cChatColor.Green .. Registered)
-			end
-		end
-	end
+function HandleLogoutCommand(Split, Player)
+	Logout(Player)
 	return true
 end
 
-
-function HandleRemoveAccountCommand( Split, Player )
-	if (Split[2] == nil) then
-		Player:SendMessage(cChatColor.LightGreen .. RemoveAcc)
-	else
-		if Storage ~= "Ini" then
-			AuthDir[Split[2]] = io.open(PluginDir .. "Players/" .. Split[2], "r" )
-			if AuthDir[Split[2]] then
-				AuthDir[Split[2]]:close()
-				os.remove(PluginDir .. "Players/" .. Split[2])
-				Player:SendMessage(cChatColor.LightGreen .. AccountRemoved)
-			else
-				Player:SendMessage(cChatColor.Rose .. DeleteNoAccount)
-			end
-		else
-			if PassIni:FindKey(Split[2]) == -1 then
-				Player:SendMessage(cChatColor.Rose .. DeleteNoAccount)
-			else
-				PassIni:DeleteKey(Split[2])
-				Player:SendMessage(cChatColor.LightGreen .. AccountRemoved)
-			end
-		end
+function HandleRemoveAccCommand(Split, Player)
+	if #Split ~= 2 then
+		Player:SendMessage(cChatColor.Rose .. "Usage: /removeacc [TargetPlayer]")
+		return true
 	end
+	if PassWords:RemovePlayer(Split[2]) then
+		Player:SendMessage(cChatColor.LightGreen .. "Account " .. Split[2] .. " was removed")
+		return true
+	end
+	Player:SendMessage(cChatColor.Rose .. "Account " .. Split[2] .. " does not exist")
 	return true
+end
+
+function HandleConsoleRemoveAccCommand(Split)
+	if #Split ~= 2 then
+		LOG("Usage: removeacc [TargetPlayer]")
+		return true
 	end
-
-
+	if PassWords:RemovePlayer(Split[2]) then
+		LOG("Account " .. Split[2] .. " was removed")
+		return true
+	end
+	LOG("Account " .. Split[2] .. " does not exist")
+	return true
+end

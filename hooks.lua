@@ -1,156 +1,117 @@
--- Author STR_Warrior --
-
-function OnExecuteCommand(Player, CommandSplit)
-	if (Player == nil) then
-		return false;
-	end
-	if (Auth[Player:GetName()] == true) then
-		return false;
-	end
-	if Storage ~= "Ini" then
-		AuthDir[Player:GetName()] = io.open(PluginDir .. "Players/" .. Player:GetName(), "r" )
-		if 	AuthDir[Player:GetName()] then
-			AuthDir[Player:GetName()]:close()
-			if (CommandSplit[1] ~= "/login") then 
-				return true
-			end
-		else		
-			if (CommandSplit[1] ~= "/register") then
-				return true
-			end
-		end
-	else
-		if PassIni:FindKey(Player:GetName()) ~= -1 then
-			if (CommandSplit[1] ~= "/login") then 
-				return true
-			end
-		else		
-			if (CommandSplit[1] ~= "/register") then
-				return true
-			end 
-		end
-	end
-end
-
-function OnPlayerTossingItem(Player)
-	if Auth[Player:GetName()] == false then
-		Player:SendMessage(cChatColor.Rose .. TossingItem)
-		return true
-	end
-end
-
-function OnHandshake(ClientHandle, UserName)	
-	local loopPlayers = function( Player )
-		if (Player:GetName() == UserName) then
-			Player:SendMessage( "Somebody just tried to login in under your name." )
-			ClientHandle:Kick("There is already somebody with that name")
-			return true
-		end
-    end
-    local loopWorlds = function ( World )
-        World:ForEachPlayer( loopPlayers )
-    end
-	cRoot:Get():ForEachWorld( loopWorlds )
-end
+--[[Created by STR_Warrior]]--
 
 function OnDisconnect(Player)
-	if Auth[Player:GetName()] == false then
-		LOGWARN("Player " .. Player:GetName() .. " Logged out without logging in")
+	local PlayerName = Player:GetName()
+	if not IsAuthed[PlayerName] then
+		LOGWARNING("Player " .. PlayerName .. " Logged out while not being logged in")
 	end
+	IsAuthed[PlayerName] = false
 end
 
-function OnChat(Player)
-	if Auth[Player:GetName()] == false then
-		Player:SendMessage(cChatColor.Rose .. OnPlayerChat)
-		return true
-	end
-end
-
-function OnPlayerLeftClick(Player)
-	if Auth[Player:GetName()] == false then
-		Player:SendMessage(cChatColor.Rose .. OnBreaking)
-		return true
-	end
-end
-
-function OnPlayerRightClick(Player)
-	if Auth[Player:GetName()] == false then
-		Player:SendMessage(cChatColor.Rose .. OnPlacing)
-		return true
+function OnHandshake(Client, UserName)
+	if cRoot:Get():FindAndDoWithPlayer(UserName, function(OtherPlayer)
+		if UserName == OtherPlayer:GetName() then
+			return true
+		end
+		return false
+	end) then
+		Client:Kick("There is somebody else online with the same name")
 	end
 end
 
 function OnPlayerJoined(Player)
-	PlayerMSG[Player:GetName()] = 1
-	Count[Player:GetName()] = Tries
-	X[Player:GetName()] = Player:GetPosX()
-	Y[Player:GetName()] = Player:GetPosY()
-	Z[Player:GetName()] = Player:GetPosZ()
-	if tDisable == true then
-		Auth[Player:GetName()] = true
-		tDisable = false
-		return false
-	end
-	if Disable == true then
-		Auth[Player:GetName()] = true
-		return false
+	local PlayerName = Player:GetName()
+	local World = Player:GetWorld()
+	PlayerPos[PlayerName] = Vector3d(Player:GetPosX(), Player:GetPosY(), Player:GetPosZ())
+	IsAuthed[PlayerName] = false
+	if PassWords:PlayerExists(PlayerName) then
+		Player:SendMessage(cChatColor.LightGreen .. "Use /login to login")
 	else
-		Auth[Player:GetName()] = false
+		Player:SendMessage(cChatColor.Rose .. "Use /register to register")
 	end
-	if Storage ~= "Ini" then
-		AuthDir[Player:GetName()] = io.open(PluginDir .. "Players/" .. Player:GetName(), "r" )
-		if AuthDir[Player:GetName()] then
-			AuthDir[Player:GetName()]:close()
-			Player:SendMessage(cChatColor.Rose .. NotLoggedIn)
-		else		
-			Player:SendMessage(cChatColor.LightGreen .. NotRegistered)
-		end
-	else
-		if PassIni:FindKey(Player:GetName()) ~= -1 then
-			Player:SendMessage(cChatColor.Rose .. NotLoggedIn)
-		else
-			Player:SendMessage(cChatColor.LightGreen .. NotRegistered)
-		end
+	
+	if World ~= nil then
+		Player:TeleportToCoords(World:GetSpawnX(), World:GetSpawnY(), World:GetSpawnZ())
 	end
 end
 
 function OnTakeDamage(Receiver, TDI)
-	if Receiver:IsPlayer() == true then
-		if Auth[Receiver:GetName()] == false then
-			TDI.FinalDamage = 0
+	if Receiver:IsPlayer() then
+		if not IsAuthed[Receiver:GetName()] then
+			return true
+		end
+	end
+	if TDI.Attacker ~= nil and TDI.Attacker:IsPlayer() then
+		local AttackerPlayer = tolua.cast(TDI.Attacker,"cPlayer")
+		if not IsAuthed[AttackerPlayer:GetName()] then
+			AttackerPlayer:SendMessage("Log in first")
+			return true
 		end
 	end
 end
 
-function OnTick()
-	local loopPlayers = function( Player )
-		World = Player:GetWorld()
-		if Auth[Player:GetName()] == false then
-			PlayerMSG[Player:GetName()] = PlayerMSG[Player:GetName()] + 1
-			if PlayerMSG[Player:GetName()] == 40 then
-				if Storage ~= "Ini" then
-					if AuthDir[Player:GetName()] then
-						Player:SendMessage(cChatColor.Rose .. NotLoggedIn)
-						PlayerMSG[Player:GetName()] = 1
-					else
-						Player:SendMessage(cChatColor.Rose .. NotRegistered)
-						PlayerMSG[Player:GetName()] = 1
-					end
-				else
-					if PassIni:FindKey(Player:GetName()) == -1 then
-						Player:SendMessage(cChatColor.Rose .. NotRegistered)
-						PlayerMSG[Player:GetName()] = 1
-					else
-						Player:SendMessage(cChatColor.Rose .. NotLoggedIn)
-						PlayerMSG[Player:GetName()] = 1
-					end
-				end
-			end
-			Player:TeleportToCoords( World:GetSpawnX(), World:GetSpawnY(), World:GetSpawnZ() )
+function OnRightClick(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, CursorY, CursorZ, BlockType, BlockMeta)
+	local PlayerName = Player:GetName()
+	if BlockX == -1 and BlockY == 255 and BlockZ == -1 then
+		if not IsAuthed[PlayerName] then
+			return true
 		end
+		return false
 	end
-	local loopWorlds = function ( World )
-		World:ForEachPlayer( loopPlayers )
+	if not IsAuthed[PlayerName] then
+		Player:SendMessage("Log in first")
+		return true
 	end
-	cRoot:Get():ForEachWorld( loopWorlds )
+end
+
+function OnLeftClick(Player, BlockX, BlockY, BlockZ, BlockFace, Status)
+	if Status == 1 then
+		return false
+	end
+	if not IsAuthed[Player:GetName()] then
+		Player:SendMessage("Log in first")
+		return true
+	end 
+end
+
+function OnExecuteCommand(Player, CommandSplit)
+	if Player == nil then
+		return false
+	end
+	local PlayerName = Player:GetName()
+	if not IsAuthed[PlayerName] then
+		if CommandSplit[1] == "/login" or CommandSplit[1] == "/register" then
+			return false
+		end
+		Player:SendMessage(cChatColor.Rose .. "Login first before using commands")
+		return true
+	end
+end
+
+function OnChat(Player, Message)
+	local PlayerName = Player:GetName()
+	if not IsAuthed[PlayerName] then
+		Player:SendMessage(cChatColor.Rose .. "Login first before talking")
+		return true
+	end
+end
+
+function OnPlayerMoving(Player)
+	if not IsAuthed[Player:GetName()] then
+		local World = Player:GetWorld()
+		Player:TeleportToCoords(World:GetSpawnX(), World:GetSpawnY(), World:GetSpawnZ())
+	end
+end
+
+function OnTick(Time)
+	Ticks = Ticks + 1 -- We don't want to check everyone every tick.
+	if Ticks > 10 then
+		cRoot:Get():ForEachPlayer(function(Player)
+			if not IsAuthed[Player:GetName()] then
+				local World = Player:GetWorld()
+				Player:TeleportToCoords(World:GetSpawnX(), World:GetSpawnY(), World:GetSpawnZ())
+			end
+		end)
+		Ticks = 0
+	end
 end
