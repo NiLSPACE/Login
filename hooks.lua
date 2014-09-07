@@ -26,7 +26,7 @@ function OnPlayerJoined(Player)
 
 end
 
-function OnSpawned(Player)
+function OnPlayerSpawned(Player)
 
     	local PlayerName = Player:GetName()
     	if not IsAuthed[PlayerName] then
