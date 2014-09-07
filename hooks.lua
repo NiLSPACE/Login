@@ -26,38 +26,38 @@ end
 function OnPlayerJoined(Player)
 	
   if Player == nil then
-		return 
-	end
+	return 
+  end
 	
-		local PlayerName = Player:GetName()
-		IsAuthed[PlayerName] = false
+  local PlayerName = Player:GetName()
+  IsAuthed[PlayerName] = false
 
 end
 
 function OnPlayerSpawned(Player)
 	
-		if Player == nil then
-        return 
-    end
+	if Player == nil then
+		return 
+	end
     
-	  local PlayerName = Player:GetName()
-	  if not IsAuthed[PlayerName] then
+	local PlayerName = Player:GetName()
+	if not IsAuthed[PlayerName] then
 		
-			local World = Player:GetWorld()
+		local World = Player:GetWorld()
 	    
-			PlayerPos[PlayerName] = Vector3d(Player:GetPosX(), Player:GetPosY(), Player:GetPosZ())
+		PlayerPos[PlayerName] = Vector3d(Player:GetPosX(), Player:GetPosY(), Player:GetPosZ())
 	
-			if PassWords:PlayerExists(PlayerName) then
-			   Player:SendMessage(cChatColor.Rose .. "Please log in using /login [password]")
-			else
-		   	   Player:SendMessage(cChatColor.Rose .. "Please register using /register [password] [confirm_password]")
-			end
+		if PassWords:PlayerExists(PlayerName) then
+			Player:SendMessage(cChatColor.Rose .. "Please log in using /login [password]")
+		else
+			Player:SendMessage(cChatColor.Rose .. "Please register using /register [password] [confirm_password]")
+		end
 	    
-		  if World ~= nil then
-			  Player:TeleportToCoords(World:GetSpawnX(), World:GetSpawnY(), World:GetSpawnZ())
-	    end
+		if World ~= nil then
+			Player:TeleportToCoords(World:GetSpawnX(), World:GetSpawnY(), World:GetSpawnZ())
+	    	end
 	    
-	 end
+	end
 	
 end
 
