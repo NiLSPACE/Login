@@ -14,7 +14,7 @@ function Initialize(Plugin)
 	
 	LoadSettings(PLUGIN:GetLocalFolder() .. "/Config.ini")
 	
-	cPluginManager.AddHook(cPluginManager.HOOK_DISCONNECT, OnDisconnect)
+	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_DESTROYED, OnPlayerDestroyed)
 	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_JOINED, OnPlayerJoined)
 	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_SPAWNED, OnPlayerSpawned)
 	cPluginManager.AddHook(cPluginManager.HOOK_HANDSHAKE, OnHandshake)
