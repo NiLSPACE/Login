@@ -15,8 +15,9 @@ function Initialize(Plugin)
 	
 	LoadSettings(PLUGIN:GetLocalFolder() .. "/Config.ini")
 	
+	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_DESTROYED, OnPlayerDestroyed)
 	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_JOINED, OnPlayerJoined)
-  cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_DESTROYED, OnPlayerDestroyed)
+	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_SPAWNED, OnPlayerSpawned)
 	cPluginManager.AddHook(cPluginManager.HOOK_HANDSHAKE, OnHandshake)
 	cPluginManager.AddHook(cPluginManager.HOOK_TAKE_DAMAGE, OnTakeDamage)
 	cPluginManager.AddHook(cPluginManager.HOOK_EXECUTE_COMMAND, OnExecuteCommand)
@@ -25,7 +26,6 @@ function Initialize(Plugin)
 	
 	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_RIGHT_CLICK, OnRightClick)
 	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_LEFT_CLICK, OnLeftClick)
-	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_SPAWNED, OnPlayerSpawned)
 	
 	local PluginManager = cRoot:Get():GetPluginManager()
 	PluginManager:BindCommand("/register",      "login.register",    HandleRegisterCommand,    " - Used to create an account in the Login plugin")
@@ -127,13 +127,7 @@ function Logout(Player)
 	local World = Player:GetWorld()
 	PlayerPos[PlayerName] = Vector3d(Player:GetPosX(), Player:GetPosY(), Player:GetPosZ())
 	Player:TeleportToCoords(World:GetSpawnX(), World:GetSpawnY(), World:GetSpawnZ())
-	
-	if(AlreadyLoggedin[PlayerName] == nil) then
-		IsAuthed[PlayerName] = false
-	else
-		AlreadyLoggedin[PlayerName] = nil
-	end
-	
+	IsAuthed[PlayerName] = false
 	Player:SendMessage(cChatColor.LightGreen .. "You logged out")
 end
 
