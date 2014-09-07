@@ -4,6 +4,7 @@ PassWords = nil
 IsAuthedWebAdmin = {}
 IsAuthed = {}
 PlayerPos = {}
+AlreadyLoggedin = {}
 
 Ticks = 0
 
