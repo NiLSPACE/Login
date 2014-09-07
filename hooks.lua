@@ -25,12 +25,12 @@ end
 
 function OnPlayerJoined(Player)
 	
-  if Player == nil then
-	return 
-  end
-	
-  local PlayerName = Player:GetName()
-  IsAuthed[PlayerName] = false
+	if Player == nil then
+		return 
+	end
+		
+	local PlayerName = Player:GetName()
+	IsAuthed[PlayerName] = false
 
 end
 
