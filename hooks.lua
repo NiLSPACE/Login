@@ -90,7 +90,7 @@ end
 
 function OnLeftClick(Player, BlockX, BlockY, BlockZ, BlockFace, Status)
 	if Player == nil then
-		return false
+		return true
 	end
 	if Status == 1 then
 		return false
@@ -103,7 +103,7 @@ end
 
 function OnExecuteCommand(Player, CommandSplit)
 	if Player == nil then
-		return true
+		return false
 	end
 	local PlayerName = Player:GetName()
 	if not IsAuthed[PlayerName] then
