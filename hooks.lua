@@ -62,7 +62,7 @@ function OnPlayerSpawned(Player)
 end
 
 function OnTakeDamage(Receiver, TDI)
-	if Receiver ~= nil and Receiver:IsPlayer() then
+	if Receiver:IsPlayer() then
 		if not IsAuthed[Receiver:GetName()] then
 			return true
 		end
