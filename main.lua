@@ -16,7 +16,7 @@ function Initialize(Plugin)
 	
 	cPluginManager.AddHook(cPluginManager.HOOK_DISCONNECT, OnDisconnect)
 	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_JOINED, OnPlayerJoined)
-	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_SPAWNED, OnSpawned)
+	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_SPAWNED, OnPlayerSpawned)
 	cPluginManager.AddHook(cPluginManager.HOOK_HANDSHAKE, OnHandshake)
 	cPluginManager.AddHook(cPluginManager.HOOK_TAKE_DAMAGE, OnTakeDamage)
 	cPluginManager.AddHook(cPluginManager.HOOK_EXECUTE_COMMAND, OnExecuteCommand)
