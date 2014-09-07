@@ -1,9 +1,10 @@
 --[[Created by STR_Warrior]]--
 
-function OnDisconnect(Player)
+function OnPlayerDestroyed(Player)
 	local PlayerName = Player:GetName()
 	if not IsAuthed[PlayerName] then
 		LOGWARNING("Player " .. PlayerName .. " Logged out while not being logged in")
+    		Player:TeleportToCoords(PlayerPos[PlayerName].x, PlayerPos[PlayerName].y, PlayerPos[PlayerName].z)
 	end
 	IsAuthed[PlayerName] = false
 end
