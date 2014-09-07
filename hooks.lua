@@ -20,19 +20,33 @@ function OnHandshake(Client, UserName)
 end
 
 function OnPlayerJoined(Player)
+
 	local PlayerName = Player:GetName()
-	local World = Player:GetWorld()
-	PlayerPos[PlayerName] = Vector3d(Player:GetPosX(), Player:GetPosY(), Player:GetPosZ())
 	IsAuthed[PlayerName] = false
-	if PassWords:PlayerExists(PlayerName) then
-		Player:SendMessage(cChatColor.LightGreen .. "Use /login to login")
-	else
-		Player:SendMessage(cChatColor.Rose .. "Use /register to register")
-	end
+
+end
+
+function OnSpawned(Player)
+
+    	local PlayerName = Player:GetName()
+    	if not IsAuthed[PlayerName] then
 	
-	if World ~= nil then
-		Player:TeleportToCoords(World:GetSpawnX(), World:GetSpawnY(), World:GetSpawnZ())
-	end
+		local World = Player:GetWorld()
+    
+		PlayerPos[PlayerName] = Vector3d(Player:GetPosX(), Player:GetPosY(), Player:GetPosZ())
+
+		if PassWords:PlayerExists(PlayerName) then
+		   Player:SendMessage(cChatColor.LightGreen .. "Use /login to login")
+		else
+	   	   Player:SendMessage(cChatColor.Rose .. "Use /register to register")
+		end
+    
+	        if World ~= nil then
+		  Player:TeleportToCoords(World:GetSpawnX(), World:GetSpawnY(), World:GetSpawnZ())
+    		end
+    
+  	end
+	
 end
 
 function OnTakeDamage(Receiver, TDI)
