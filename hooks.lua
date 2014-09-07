@@ -1,12 +1,14 @@
 --[[Created by STR_Warrior]]--
 
 function OnPlayerDestroyed(Player)
-	local PlayerName = Player:GetName()
-	if not IsAuthed[PlayerName] then
-		LOGWARNING("Player " .. PlayerName .. " Logged out while not being logged in")
-    		Player:TeleportToCoords(PlayerPos[PlayerName].x, PlayerPos[PlayerName].y, PlayerPos[PlayerName].z)
+	if Player ~= nil then
+		local PlayerName = Player:GetName()
+		if not IsAuthed[PlayerName] then
+			LOGWARNING("Player " .. PlayerName .. " Logged out while not being logged in")
+	    		Player:MoveTo(Vector3d(PlayerPos[PlayerName].x, PlayerPos[PlayerName].y, PlayerPos[PlayerName].z))
+		end
+		IsAuthed[PlayerName] = false
 	end
-	IsAuthed[PlayerName] = false
 end
 
 function OnHandshake(Client, UserName)
@@ -21,32 +23,36 @@ function OnHandshake(Client, UserName)
 end
 
 function OnPlayerJoined(Player)
-
-	local PlayerName = Player:GetName()
-	IsAuthed[PlayerName] = false
+	
+	if Player ~= nil then
+		local PlayerName = Player:GetName()
+		IsAuthed[PlayerName] = false
+	end
 
 end
 
 function OnPlayerSpawned(Player)
-
-    	local PlayerName = Player:GetName()
-    	if not IsAuthed[PlayerName] then
 	
-		local World = Player:GetWorld()
-    
-		PlayerPos[PlayerName] = Vector3d(Player:GetPosX(), Player:GetPosY(), Player:GetPosZ())
-
-		if PassWords:PlayerExists(PlayerName) then
-		   Player:SendMessage(cChatColor.LightGreen .. "Use /login to login")
-		else
-	   	   Player:SendMessage(cChatColor.Rose .. "Use /register to register")
-		end
-    
-	        if World ~= nil then
-		  Player:TeleportToCoords(World:GetSpawnX(), World:GetSpawnY(), World:GetSpawnZ())
-    		end
-    
-  	end
+	if Player ~= nil then
+	    	local PlayerName = Player:GetName()
+	    	if not IsAuthed[PlayerName] then
+		
+			local World = Player:GetWorld()
+	    
+			PlayerPos[PlayerName] = Vector3d(Player:GetPosX(), Player:GetPosY(), Player:GetPosZ())
+	
+			if PassWords:PlayerExists(PlayerName) then
+			   Player:SendMessage(cChatColor.LightGreen .. "Use /login to login")
+			else
+		   	   Player:SendMessage(cChatColor.Rose .. "Use /register to register")
+			end
+	    
+		        if World ~= nil then
+			  Player:TeleportToCoords(World:GetSpawnX(), World:GetSpawnY(), World:GetSpawnZ())
+	    		end
+	    
+	  	end
+	end
 	
 end
 
@@ -66,6 +72,9 @@ function OnTakeDamage(Receiver, TDI)
 end
 
 function OnRightClick(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, CursorY, CursorZ, BlockType, BlockMeta)
+	if Player == nil then
+		return true
+	end
 	local PlayerName = Player:GetName()
 	if BlockX == -1 and BlockY == 255 and BlockZ == -1 then
 		if not IsAuthed[PlayerName] then
@@ -80,6 +89,9 @@ function OnRightClick(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, Cursor
 end
 
 function OnLeftClick(Player, BlockX, BlockY, BlockZ, BlockFace, Status)
+	if Player == nil then
+		return false
+	end
 	if Status == 1 then
 		return false
 	end
@@ -91,7 +103,7 @@ end
 
 function OnExecuteCommand(Player, CommandSplit)
 	if Player == nil then
-		return false
+		return true
 	end
 	local PlayerName = Player:GetName()
 	if not IsAuthed[PlayerName] then
@@ -104,6 +116,9 @@ function OnExecuteCommand(Player, CommandSplit)
 end
 
 function OnChat(Player, Message)
+	if Player == nil then
+		return true
+	end
 	local PlayerName = Player:GetName()
 	if not IsAuthed[PlayerName] then
 		Player:SendMessage(cChatColor.Rose .. "Login first before talking")
@@ -112,6 +127,9 @@ function OnChat(Player, Message)
 end
 
 function OnPlayerMoving(Player)
+	if Player == nil then
+		return true
+	end
 	if not IsAuthed[Player:GetName()] then
 		local World = Player:GetWorld()
 		Player:TeleportToCoords(World:GetSpawnX(), World:GetSpawnY(), World:GetSpawnZ())
