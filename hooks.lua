@@ -1,15 +1,23 @@
 --[[Created by STR_Warrior]]--
 
 function OnPlayerDestroyed(Player)
+
 	if Player == nil then
 		return 
 	end
+	
 	local PlayerName = Player:GetName()
 	if not IsAuthed[PlayerName] then
 		LOGWARNING("Player " .. PlayerName .. " Logged out while not being logged in")
 	    Player:MoveTo(Vector3d(PlayerPos[PlayerName].x, PlayerPos[PlayerName].y, PlayerPos[PlayerName].z))
 	end
-	IsAuthed[PlayerName] = false
+	
+	if(AlreadyLoggedin[PlayerName] == nil) then
+		IsAuthed[PlayerName] = false
+	else
+		AlreadyLoggedin[PlayerName] = nil
+	end
+	
 end
 
 function OnHandshake(Client, UserName)
@@ -19,8 +27,15 @@ function OnHandshake(Client, UserName)
 		end
 		return false
 	end) then
+		AlreadyLoggedin[UserName] = 1
 		Client:Kick("There is somebody else online with the same name")
+		
+		return true
 	end
+	
+	AlreadyLoggedin[UserName] = nil
+	
+	return false
 end
 
 function OnPlayerJoined(Player)
@@ -30,8 +45,10 @@ function OnPlayerJoined(Player)
 	end
 		
 	local PlayerName = Player:GetName()
-	IsAuthed[PlayerName] = false
-
+	
+	if(AlreadyLoggedin[PlayerName] == nil) then
+		IsAuthed[PlayerName] = false
+	end
 end
 
 function OnPlayerSpawned(Player)
@@ -55,7 +72,7 @@ function OnPlayerSpawned(Player)
 	    
 		if World ~= nil then
 			Player:TeleportToCoords(World:GetSpawnX(), World:GetSpawnY(), World:GetSpawnZ())
-	    	end
+	    end
 	    
 	end
 	
