@@ -1,14 +1,15 @@
 --[[Created by STR_Warrior]]--
 
 function OnPlayerDestroyed(Player)
-	if Player ~= nil then
-		local PlayerName = Player:GetName()
-		if not IsAuthed[PlayerName] then
-			LOGWARNING("Player " .. PlayerName .. " Logged out while not being logged in")
-	    		Player:MoveTo(Vector3d(PlayerPos[PlayerName].x, PlayerPos[PlayerName].y, PlayerPos[PlayerName].z))
-		end
-		IsAuthed[PlayerName] = false
+	if Player == nil then
+		return 
 	end
+	local PlayerName = Player:GetName()
+	if not IsAuthed[PlayerName] then
+		LOGWARNING("Player " .. PlayerName .. " Logged out while not being logged in")
+	    Player:MoveTo(Vector3d(PlayerPos[PlayerName].x, PlayerPos[PlayerName].y, PlayerPos[PlayerName].z))
+	end
+	IsAuthed[PlayerName] = false
 end
 
 function OnHandshake(Client, UserName)
@@ -24,18 +25,23 @@ end
 
 function OnPlayerJoined(Player)
 	
-	if Player ~= nil then
+  if Player == nil then
+		return 
+	end
+	
 		local PlayerName = Player:GetName()
 		IsAuthed[PlayerName] = false
-	end
 
 end
 
 function OnPlayerSpawned(Player)
 	
-	if Player ~= nil then
-	    	local PlayerName = Player:GetName()
-	    	if not IsAuthed[PlayerName] then
+		if Player == nil then
+        return 
+    end
+    
+	  local PlayerName = Player:GetName()
+	  if not IsAuthed[PlayerName] then
 		
 			local World = Player:GetWorld()
 	    
@@ -47,12 +53,11 @@ function OnPlayerSpawned(Player)
 		   	   Player:SendMessage(cChatColor.Rose .. "Please register using /register [password] [confirm_password]")
 			end
 	    
-		        if World ~= nil then
+		  if World ~= nil then
 			  Player:TeleportToCoords(World:GetSpawnX(), World:GetSpawnY(), World:GetSpawnZ())
-	    		end
+	    end
 	    
-	  	end
-	end
+	 end
 	
 end
 
