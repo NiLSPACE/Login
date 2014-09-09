@@ -6,17 +6,12 @@ function OnPlayerDestroyed(Player)
 		return 
 	end
 	
-	local PlayerName = Player:GetName()
-	if not IsAuthed[PlayerName] then
-		LOGWARNING("Player " .. PlayerName .. " Logged out while not being logged in")
-	    Player:MoveTo(Vector3d(PlayerPos[PlayerName].x, PlayerPos[PlayerName].y, PlayerPos[PlayerName].z))
+	if not IsAuthed[Player:GetUniqueID()] then
+		LOGWARNING("Player " .. Player:GetName() .. " Logged out while not being logged in")
+		Player:MoveTo(Vector3d(PlayerPos[Player:GetUniqueID()].x, PlayerPos[Player:GetUniqueID()].y, PlayerPos[Player:GetUniqueID()].z))
 	end
-	
-	if(AlreadyLoggedin[PlayerName] == nil) then
-		IsAuthed[PlayerName] = false
-	else
-		AlreadyLoggedin[PlayerName] = nil
-	end
+
+	IsAuthed[Player:GetUniqueID()] = nil
 	
 end
 
@@ -26,14 +21,13 @@ function OnHandshake(Client, UserName)
 			return true
 		end
 		return false
-	end) then
-		AlreadyLoggedin[UserName] = 1
-		Client:Kick("There is somebody else online with the same name")
 		
-		return true
-	end
+	end) then
 	
-	AlreadyLoggedin[UserName] = nil
+		Client:Kick("There is somebody else online with the same name")
+		return true
+		
+	end
 	
 	return false
 end
@@ -43,12 +37,9 @@ function OnPlayerJoined(Player)
 	if Player == nil then
 		return 
 	end
-		
-	local PlayerName = Player:GetName()
 	
-	if(AlreadyLoggedin[PlayerName] == nil) then
-		IsAuthed[PlayerName] = false
-	end
+	IsAuthed[Player:GetUniqueID()] = false
+
 end
 
 function OnPlayerSpawned(Player)
@@ -58,11 +49,11 @@ function OnPlayerSpawned(Player)
 	end
     
 	local PlayerName = Player:GetName()
-	if not IsAuthed[PlayerName] then
+	if not IsAuthed[Player:GetUniqueID()] then
 		
 		local World = Player:GetWorld()
 	    
-		PlayerPos[PlayerName] = Vector3d(Player:GetPosX(), Player:GetPosY(), Player:GetPosZ())
+		PlayerPos[Player:GetUniqueID()] = Vector3d(Player:GetPosX(), Player:GetPosY(), Player:GetPosZ())
 	
 		if PassWords:PlayerExists(PlayerName) then
 			Player:SendMessage(cChatColor.Rose .. "Please log in using /login [password]")
@@ -80,13 +71,13 @@ end
 
 function OnTakeDamage(Receiver, TDI)
 	if Receiver:IsPlayer() then
-		if not IsAuthed[Receiver:GetName()] then
+		if not IsAuthed[Receiver:GetUniqueID()] then
 			return true
 		end
 	end
 	if TDI.Attacker ~= nil and TDI.Attacker:IsPlayer() then
 		local AttackerPlayer = tolua.cast(TDI.Attacker,"cPlayer")
-		if not IsAuthed[AttackerPlayer:GetName()] then
+		if not IsAuthed[AttackerPlayer:GetUniqueID()] then
 			AttackerPlayer:SendMessage(cChatColor.Rose .. "You have to log in before engaging in combat")
 			return true
 		end
@@ -97,14 +88,13 @@ function OnRightClick(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, Cursor
 	if Player == nil then
 		return true
 	end
-	local PlayerName = Player:GetName()
 	if BlockX == -1 and BlockY == 255 and BlockZ == -1 then
-		if not IsAuthed[PlayerName] then
+		if not IsAuthed[Player:GetUniqueID()] then
 			return true
 		end
 		return false
 	end
-	if not IsAuthed[PlayerName] then
+	if not IsAuthed[Player:GetUniqueID()] then
 		Player:SendMessage(cChatColor.Rose .. "Log in first.")
 		return true
 	end
@@ -117,7 +107,7 @@ function OnLeftClick(Player, BlockX, BlockY, BlockZ, BlockFace, Status)
 	if Status == 1 then
 		return false
 	end
-	if not IsAuthed[Player:GetName()] then
+	if not IsAuthed[Player:GetUniqueID()] then
 		Player:SendMessage(cChatColor.Rose .. "Log in first.")
 		return true
 	end 
@@ -127,8 +117,7 @@ function OnExecuteCommand(Player, CommandSplit)
 	if Player == nil then
 		return false
 	end
-	local PlayerName = Player:GetName()
-	if not IsAuthed[PlayerName] then
+	if not IsAuthed[Player:GetUniqueID()] then
 		if CommandSplit[1] == "/login" or CommandSplit[1] == "/register" then
 			return false
 		end
@@ -141,8 +130,7 @@ function OnChat(Player, Message)
 	if Player == nil then
 		return true
 	end
-	local PlayerName = Player:GetName()
-	if not IsAuthed[PlayerName] then
+	if not IsAuthed[Player:GetUniqueID()] then
 		Player:SendMessage(cChatColor.Rose .. "You have to log in before talking")
 		return true
 	end
@@ -152,7 +140,7 @@ function OnPlayerMoving(Player)
 	if Player == nil then
 		return true
 	end
-	if not IsAuthed[Player:GetName()] then
+	if not IsAuthed[Player:GetUniqueID()] then
 		local World = Player:GetWorld()
 		Player:TeleportToCoords(World:GetSpawnX(), World:GetSpawnY(), World:GetSpawnZ())
 	end
