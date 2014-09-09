@@ -2,7 +2,7 @@
 
 function HandleRegisterCommand(Split, Player)
 	local PlayerName = Player:GetName()
-	if IsAuthed[PlayerName] then
+	if IsAuthed[Player:GetUniqueID()] then
 		Player:SendMessage(cChatColor.LightGreen .. "You are already logged in")
 		return true
 	end
@@ -11,15 +11,15 @@ function HandleRegisterCommand(Split, Player)
 		return true
 	end
 	PassWords:AddPass(PlayerName, Split[2])
-	Player:TeleportToCoords(PlayerPos[PlayerName].x, PlayerPos[PlayerName].y, PlayerPos[PlayerName].z)
-	IsAuthed[PlayerName] = true
+	Player:TeleportToCoords(PlayerPos[Player:GetUniqueID()].x, PlayerPos[Player:GetUniqueID()].y, PlayerPos[Player:GetUniqueID()].z)
+	IsAuthed[Player:GetUniqueID()] = true
 	Player:SendMessage(cChatColor.LightGreen .. "You have registered")
 	return true
 end
 
 function HandleLoginCommand(Split, Player)
 	local PlayerName = Player:GetName()
-	if IsAuthed[PlayerName] then
+	if IsAuthed[Player:GetUniqueID()] then
 		Player:SendMessage(cChatColor.LightGreen .. "You are already logged in")
 		return true
 	end

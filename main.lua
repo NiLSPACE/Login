@@ -4,7 +4,6 @@ PassWords = nil
 IsAuthedWebAdmin = {}
 IsAuthed = {}
 PlayerPos = {}
-AlreadyLoggedin = {}
 
 Ticks = 0
 
@@ -36,7 +35,7 @@ function Initialize(Plugin)
 	PluginManager:BindConsoleCommand("removeacc",              HandleConsoleRemoveAccCommand,  " - Used to remove an account from the Login plugin")
 	
 	cRoot:Get():ForEachPlayer(function(Player)
-		IsAuthed[Player:GetName()] = true
+		IsAuthed[Player:GetUniqueID()] = true
 	end)
 	
 	PassWords = LoadPasswords(PLUGIN:GetLocalFolder() .. "/Passwords.txt")
@@ -48,7 +47,7 @@ end
 
 function OnDisable()
 	cRoot:Get():ForEachPlayer(function(Player)
-		if not IsAuthed[Player:GetName()] then
+		if not IsAuthed[Player:GetUniqueID()] then
 			Player:GetClientHandle():Kick("There was a reload and you were not logged in")
 		end
 	end)
@@ -123,18 +122,16 @@ function LoadPasswords(Path)
 end
 
 function Logout(Player)
-	local PlayerName = Player:GetName()
 	local World = Player:GetWorld()
-	PlayerPos[PlayerName] = Vector3d(Player:GetPosX(), Player:GetPosY(), Player:GetPosZ())
+	PlayerPos[Player:GetUniqueID()] = Vector3d(Player:GetPosX(), Player:GetPosY(), Player:GetPosZ())
 	Player:TeleportToCoords(World:GetSpawnX(), World:GetSpawnY(), World:GetSpawnZ())
-	IsAuthed[PlayerName] = false
+	IsAuthed[Player:GetUniqueID()] = false
 	Player:SendMessage(cChatColor.LightGreen .. "You logged out")
 end
 
 function Login(Player)
-	local PlayerName = Player:GetName()
-	IsAuthed[PlayerName] = true
-	Player:TeleportToCoords(PlayerPos[PlayerName].x, PlayerPos[PlayerName].y, PlayerPos[PlayerName].z)
+	IsAuthed[Player:GetUniqueID()] = true
+	Player:TeleportToCoords(PlayerPos[Player:GetUniqueID()].x, PlayerPos[Player:GetUniqueID()].y, PlayerPos[Player:GetUniqueID()].z)
 	Player:SendMessage(cChatColor.LightGreen .. "You are now logged in")
 end
 
