@@ -1,13 +1,17 @@
 --[[Created by STR_Warrior]]--
 
 function HandleRegisterCommand(Split, Player)
+	if (#Split ~= 3) or (Split[2] ~= Split[3]) then
+		Player:SendMessage(cChatColor.Rose .. "Usage: /register [Password] [ConfirmationPassword]")
+		return true
+	end
 	local PlayerName = Player:GetName()
 	if IsAuthed[Player:GetUniqueID()] then
 		Player:SendMessage(cChatColor.LightGreen .. "You are already logged in")
 		return true
 	end
-	if (#Split ~= 3) or (Split[2] ~= Split[3]) then
-		Player:SendMessage(cChatColor.Rose .. "Usage: /register [Password] [ConfirmationPassword]")
+	if PassWords:PlayerExists(PlayerName) then
+		Player:SendMessage(cChatColor.Rose .. "This username is already registered, you cannot do that.")
 		return true
 	end
 	PassWords:AddPass(PlayerName, Split[2])
@@ -18,15 +22,15 @@ function HandleRegisterCommand(Split, Player)
 end
 
 function HandleLoginCommand(Split, Player)
-	local PlayerName = Player:GetName()
-	if IsAuthed[Player:GetUniqueID()] then
-		Player:SendMessage(cChatColor.LightGreen .. "You are already logged in")
-		return true
-	end
 	if #Split ~= 2 then
 		Player:SendMessage(cChatColor.Rose .. "Usage: /login [Password]")
 		return true
 	end
+	if IsAuthed[Player:GetUniqueID()] then
+		Player:SendMessage(cChatColor.LightGreen .. "You are already logged in")
+		return true
+	end
+	local PlayerName = Player:GetName()
 	local Succes, Password = PassWords:GetPassFromPlayer(PlayerName)
 	if not Succes then
 		Player:SendMessage(cChatColor.Rose .. "You are not registered")
