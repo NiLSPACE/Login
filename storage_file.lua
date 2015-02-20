@@ -45,7 +45,7 @@ end
 
 
 function cFileStorage:UpdatePassword(a_UUID, a_NewPassword)
-	self.Obj.Passwords[a_UUID] = md5(a_NewPassword)
+	self.Passwords[a_UUID] = md5(a_NewPassword)
 	return true
 end
 
@@ -54,7 +54,7 @@ end
 
 
 function cFileStorage:UUIDExists(a_UUID)
-	return self.Obj.Passwords[a_UUID] ~= nil
+	return self.Passwords[a_UUID] ~= nil
 end
 
 
