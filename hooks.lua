@@ -18,7 +18,7 @@ end
 
 
 function OnPlayerDestroyed(a_Player)
-	-- TODO
+	RemovePlayerState(a_Player)
 end
 
 
@@ -26,7 +26,8 @@ end
 
 
 function OnPlayerJoined(a_Player)
-	print(g_PassStorage:UUIDExists(a_Player:GetUUID()))
+	GetPlayerState(a_Player) -- Create the playerstate for the player
+	-- print(a_Player:GetUUID(), g_PassStorage:GetPasswordFromUUID(a_Player:GetUUID()), g_PassStorage:GetPasswordFromUUID(a_Player:GetUUID()) == md5("admin"))
 	-- TODO
 end
 
@@ -51,7 +52,35 @@ function OnExecuteCommand(a_Player, a_Command)
 		return false
 	end
 	
-	-- TODO
+	local PlayerState = GetPlayerState(a_Player)
+	if (PlayerState:IsLoggedIn()) then
+		return false
+	end
+	
+	if (PlayerState:IsRegistered()) then
+		if (a_Command[1] ~= "/login") then
+			a_Player:SendMessage(
+				cCompositeChat()
+				:AddTextPart("Please use ")
+				:AddSuggestCommandPart("/login", "/login", "u")
+				:AddTextPart(" first before trying to execute a command.")
+			)
+			return true
+		end
+		return true
+	end
+	
+	if (a_Command[1] == "/register") then
+		return false
+	end
+	
+	a_Player:SendMessage(
+		cCompositeChat()
+		:AddTextPart("Please use ")
+		:AddSuggestCommandPart("/register", "/register", "u")
+		:AddTextPart(" first before trying to execute a command.")
+	)
+	return true
 end
 
 
@@ -69,3 +98,7 @@ end
 function OnPlayerMoving(a_Player, a_OldPosition, a_NewPosition)
 	-- TODO
 end
+
+
+
+
