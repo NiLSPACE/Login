@@ -31,6 +31,14 @@ end
 
 
 
+function cPlayerState:IsRegistered()
+	return self:Exists()
+end
+
+
+
+
+
 function cPlayerState:Exists()
 	 g_PassStorage:UUIDExists(self.m_UUID)
 end
