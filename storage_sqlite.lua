@@ -15,7 +15,11 @@ function cSQLiteStorage:__call()
 	setmetatable(Obj, cSQLiteStorage)
 	self.__index = self
 	
-	Obj.m_DB = cSQLiteHandler(cRoot:Get():GetPluginManager():GetCurrentPlugin():GetLocalFolder() .. "/storage.sqlite")
+	local Table = cTable("players")
+	:Field("uuid", "TEXT")
+	:Field("password", "TEXT")
+	
+	Obj.m_DB = cSQLiteHandler(cRoot:Get():GetPluginManager():GetCurrentPlugin():GetLocalFolder() .. "/storage.sqlite", Table)
 	
 	return Obj
 end

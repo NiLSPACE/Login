@@ -106,7 +106,7 @@ end
 
 
 -- Constructor
-function cSQLiteHandler:__call(a_Path)
+function cSQLiteHandler:__call(a_Path, a_Table)
 	local m_DB, ErrCode, ErrMsg = sqlite3.open(a_Path)
 	
 	if (not m_DB) then
@@ -118,7 +118,17 @@ function cSQLiteHandler:__call(a_Path)
 	setmetatable(Obj, cSQLiteHandler)
 	self.__index = self
 	
+	
 	Obj.m_DB = m_DB
+	
+	if (a_Table ~= nil) then
+		-- a_Table isn't nil, so we must create a new table if it doesn't exist
+		local sql = a_Table:Compose()
+		local res, Err = Obj:Query(sql)
+		if (not res) then
+			LOGWARNING("Could not create table %s", Err)
+		end
+	end
 	
 	return Obj
 end
