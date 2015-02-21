@@ -4,13 +4,15 @@
 
 
 function InitHooks(a_Plugin)
-	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_DESTROYED, OnPlayerDestroyed)
-	-- cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_JOINED,    OnPlayerJoined)
-	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_SPAWNED,   OnPlayerSpawned)
-	cPluginManager:AddHook(cPluginManager.HOOK_TAKE_DAMAGE,      OnTakeDamage)
-	cPluginManager:AddHook(cPluginManager.HOOK_EXECUTE_COMMAND,  OnExecuteCommand)
-	cPluginManager:AddHook(cPluginManager.HOOK_CHAT,             OnChat)
-	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_MOVING,    OnPlayerMoving)
+	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_DESTROYED,   OnPlayerDestroyed)
+	-- cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_JOINED,      OnPlayerJoined)
+	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_SPAWNED,     OnPlayerSpawned)
+	cPluginManager:AddHook(cPluginManager.HOOK_TAKE_DAMAGE,        OnTakeDamage)
+	cPluginManager:AddHook(cPluginManager.HOOK_EXECUTE_COMMAND,    OnExecuteCommand)
+	cPluginManager:AddHook(cPluginManager.HOOK_CHAT,               OnChat)
+	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_MOVING,      OnPlayerMoving)
+	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_RIGHT_CLICK, OnPlayerRightClick)
+	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_LEFT_CLICK,  OnPlayerLeftClick)
 end
 
 
@@ -164,6 +166,49 @@ function OnPlayerMoving(a_Player, a_OldPosition, a_NewPosition)
 		World:GetSpawnY(),
 		World:GetSpawnZ()
 	)
+end
+
+
+
+
+
+function OnPlayerRightClick(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ)
+	local PlayerState = GetPlayerState(a_Player)
+	if (PlayerState:IsLoggedIn()) then
+		return false
+	end
+	
+	if (a_BlockFace == BLOCK_FACE_NONE) then
+		-- We still block this packet, but we don't send a message because the player could get another message when he was clicking a block
+		return true
+	end
+	
+	a_Player:SendMessage(
+		cCompositeChat()
+		:AddTextPart("Please use ")
+		:AddSuggestCommandPart("/login", "/login", "u")
+		:AddTextPart(" first.")
+	)
+	return true
+end
+
+
+
+
+
+function OnPlayerLeftClick(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Action)
+	local PlayerState = GetPlayerState(a_Player)
+	if (PlayerState:IsLoggedIn()) then
+		return false
+	end
+	
+	a_Player:SendMessage(
+		cCompositeChat()
+		:AddTextPart("Please use ")
+		:AddSuggestCommandPart("/login", "/login", "u")
+		:AddTextPart(" first.")
+	)
+	return true
 end
 
 
