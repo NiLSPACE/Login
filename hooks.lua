@@ -5,8 +5,8 @@
 
 function InitHooks(a_Plugin)
 	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_DESTROYED, OnPlayerDestroyed)
-	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_JOINED,    OnPlayerJoined)
-	-- cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_SPAWNED,   OnPlayerSpawned)
+	-- cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_JOINED,    OnPlayerJoined)
+	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_SPAWNED,   OnPlayerSpawned)
 	cPluginManager:AddHook(cPluginManager.HOOK_TAKE_DAMAGE,      OnTakeDamage)
 	cPluginManager:AddHook(cPluginManager.HOOK_EXECUTE_COMMAND,  OnExecuteCommand)
 	cPluginManager:AddHook(cPluginManager.HOOK_CHAT,             OnChat)
@@ -25,10 +25,28 @@ end
 
 
 
-function OnPlayerJoined(a_Player)
-	GetPlayerState(a_Player) -- Create the playerstate for the player
-	-- print(a_Player:GetUUID(), g_PassStorage:GetPasswordFromUUID(a_Player:GetUUID()), g_PassStorage:GetPasswordFromUUID(a_Player:GetUUID()) == md5("admin"))
-	-- TODO
+function OnPlayerSpawned(a_Player)
+	-- Create the playerstate for the player
+	local PlayerState = GetPlayerState(a_Player)
+	
+	if (PlayerState:IsLoggedIn()) then
+		-- OnPlayerSpawned is also called when the player respawned, so we can't blindly teleport the player
+		return false
+	end
+	
+	-- Teleport the player to the spawn of the world
+	local World = a_Player:GetWorld()
+	local UUID = a_Player:GetUUID()
+	World:QueueTask(
+		function()
+			cRoot:Get():DoWithPlayerByUUID(UUID,
+				function(a_Player)
+					-- print(World:GetSpawnX(), World:GetSpawnY(), World:GetSpawnZ())
+					a_Player:TeleportToCoords(World:GetSpawnX(), World:GetSpawnY(), World:GetSpawnZ())
+				end
+			)
+		end
+	)
 end
 
 
@@ -40,7 +58,20 @@ function OnTakeDamage(a_Receiver, a_TDI)
 		return false
 	end
 	
-	-- TODO
+	local PlayerState = GetPlayerState(a_Receiver)
+	if (PlayerState:IsLoggedIn()) then
+		-- The receiver is logged in. Check if the attacker is a player and not logged in.
+		if (a_TDI.DamageType == dtAttack) then
+			if (a_TDI.Attacker:IsPlayer()) then
+				local PlayerObj = tolua.cast(a_TDI.Attacker, "cPlayer")
+				local AttackerState = GetPlayerState(PlayerObj)
+				if (not AttackerState:IsLoggedIn()) then
+					return true
+				end
+			end
+		end
+	end
+	return true
 end
 
 
@@ -54,6 +85,7 @@ function OnExecuteCommand(a_Player, a_Command)
 	
 	local PlayerState = GetPlayerState(a_Player)
 	if (PlayerState:IsLoggedIn()) then
+		-- The player is already logged in. Allow him to use any command
 		return false
 	end
 	
@@ -67,7 +99,7 @@ function OnExecuteCommand(a_Player, a_Command)
 			)
 			return true
 		end
-		return true
+		return false
 	end
 	
 	if (a_Command[1] == "/register") then
@@ -88,7 +120,27 @@ end
 
 
 function OnChat(a_Player, a_Message)
-	-- TODO
+	local PlayerState = GetPlayerState(a_Player)
+	if (PlayerState:IsLoggedIn()) then
+		return false
+	end
+	
+	if (PlayerState:IsRegistered()) then
+		a_Player:SendMessage(
+			cCompositeChat()
+			:AddTextPart("Please use ")
+			:AddSuggestCommandPart("/login", "/login", "u")
+			:AddTextPart(" first before trying to chat.")
+		)
+	else
+		a_Player:SendMessage(
+			cCompositeChat()
+			:AddTextPart("Please ")
+			:AddSuggestCommandPart("register", "/register", "u")
+			:AddTextPart(" first before trying to chat.")
+		)
+	end
+	return true
 end
 
 
@@ -96,7 +148,22 @@ end
 
 
 function OnPlayerMoving(a_Player, a_OldPosition, a_NewPosition)
-	-- TODO
+	local PlayerState = GetPlayerState(a_Player)
+	if (PlayerState:IsLoggedIn()) then
+		return false
+	end
+	
+	if (PlayerState.Teleporting) then
+		PlayerState.Teleporting = false -- Player teleported
+		return false
+	end
+	
+	local World = a_Player:GetWorld()
+	a_Player:TeleportToCoords(
+		World:GetSpawnX(),
+		World:GetSpawnY(),
+		World:GetSpawnZ()
+	)
 end
 
 
