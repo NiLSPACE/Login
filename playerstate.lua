@@ -17,7 +17,7 @@ function GetPlayerState(a_Player, a_LoggedIn)
 		return g_PlayerStates[UUID]
 	end
 	
-	local res = cPlayerState(UUID, LoggedIn)
+	local res = cPlayerState(a_Player, LoggedIn)
 	g_PlayerStates[UUID] = res
 	
 	return res
