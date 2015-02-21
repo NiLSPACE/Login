@@ -36,7 +36,7 @@ function OnDisable()
 		function(a_Player)
 			local PlayerState = GetPlayerState(a_Player)
 			if (not PlayerState:IsLoggedIn()) then
-				a_Player:TeleportBack()
+				PlayerState:TeleportBack()
 				a_Player:GetClientHandle():Kick("The server reloaded while you were not logged in")
 			end
 		end
