@@ -140,7 +140,6 @@ end
 -- Function used we use to executed sql strings.
 function cSQLiteHandler:Query(a_SQL, a_Handler, a_Data)
 	assert(a_SQL ~= nil)
-	print(a_SQL)
 	
 	local ErrCode = self.m_DB:exec(a_SQL, a_Handler, a_Data)
 	if (ErrCode ~= sqlite3.OK) then
