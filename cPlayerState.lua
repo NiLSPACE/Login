@@ -79,13 +79,9 @@ end
 
 
 
-function cPlayerState:TryRegister(a_Password, a_ConfirmPassword)
+function cPlayerState:TryRegister(a_Password)
 	if (self:Exists()) then
 		return false, "You already have registered"
-	end
-	
-	if (a_Password ~= a_ConfirmPassword) then
-		return false, "The 2 passwords do not match"
 	end
 	
 	local res, Err = g_PassStorage:RegisterOrChangePassword(self.m_UUID, a_Password)

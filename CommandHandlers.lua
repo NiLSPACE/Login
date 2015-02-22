@@ -42,7 +42,12 @@ function HandleRegisterCommand(a_Split, a_Player)
 		return true
 	end
 	
-	local res, Err = PlayerState:TryRegister(a_Split[2], a_Split[3])
+	if (a_Split[2] ~= a_Split[3]) then
+		a_Player:SendMessage("The password doesn't match the confirmation password")
+		return true
+	end
+	
+	local res, Err = PlayerState:TryRegister(a_Split[2])
 	if (not res) then
 		a_Player:SendMessage(Err)
 		return true
