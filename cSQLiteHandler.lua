@@ -8,9 +8,15 @@ It creates some basic functions that can still do quite allot, and probably in m
 To use it you need the cWhereList, cInsertList and cUpdateList classes
 
 Usage:
-	To first create the database you call the table with the path to the file as a parameter
+	To first create the database you call the table with the path to the file as a parameter.
+	You can also give an cTable class. That way the database will automaticly create a new table if it doesn't exist.
 	Example:
 		local db = cSQLiteHandler("TestDatabase.sqlite")
+		local db = cSQLiteHandler("TestDatabase.sqlite", 
+			cTable("TestTable")
+			:Field("ID", "INTEGER", "PRIMARY KEY AUTOINCREMENT")
+			:Field("name", "TEXT")
+		)
 		
 	Get Values (Select):
 		To collect values you use the Select function. It has multiple parameters:
