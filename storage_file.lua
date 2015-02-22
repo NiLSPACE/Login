@@ -27,8 +27,6 @@ function cFileStorage:__call()
 		File:close()
 	end
 	
-	
-	
 	return Obj
 end
 
@@ -64,7 +62,7 @@ end
 function cFileStorage:Disable()
 	local File = io.open(cRoot:Get():GetPluginManager():GetCurrentPlugin():GetLocalFolder() .. "/passwords.txt", "w")
 	for UUID, Password in pairs(self.m_Passwords) do
-		File:write(UUID, "=", Password, "\n")
+		File:write("['", UUID, "'] = '", Password, "',\n")
 	end
 	File:close()
 end
