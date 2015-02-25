@@ -45,6 +45,15 @@ function InitConfig()
 		ConfigTable.Storage = 'sqlite'
 	end
 	
+	if (ConfigTable.Storage == "file") then
+		if ((type(ConfigTable.CompressionLevel) ~= 'number') and (not tonumber(ConfigTable.CompressionLevel))) then
+			LOGWARNING("[Login] Invalid compression level.")
+			ConfigTable.CompressionLevel = 5
+		end
+		
+		ConfigTable.CompressionLevel = tonumber(ConfigTable.CompressionLevel)
+	end
+	
 	g_Config = ConfigTable
 end
 

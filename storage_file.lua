@@ -15,12 +15,15 @@ function cFileStorage:__call()
 	self.__index = self
 	
 	Obj.m_Passwords = {}
+	Obj.m_Path      = cRoot:Get():GetPluginManager():GetCurrentPlugin():GetLocalFolder() .. "/passwords.dat"
 	
-	local File = io.open(cRoot:Get():GetPluginManager():GetCurrentPlugin():GetLocalFolder() .. "/passwords.txt")
+	local File = io.open(Obj.m_Path, "rb")
 	if (not File) then
-		File = io.open(cRoot:Get():GetPluginManager():GetCurrentPlugin():GetLocalFolder() .. "/passwords.txt", "w"):close()
+		File = io.open(Obj.m_Path, "w"):close()
 	else
-		for line in File:lines() do
+		local Content = File:read("*all")
+		Content = cStringCompression.InflateString(Content)
+		for line in Content:gmatch('[^\r\n]+') do
 			local Split = StringSplit(line, "=")
 			Obj.m_Passwords[Split[1]] = Split[2]
 		end
@@ -60,10 +63,13 @@ end
 
 
 function cFileStorage:Disable()
-	local File = io.open(cRoot:Get():GetPluginManager():GetCurrentPlugin():GetLocalFolder() .. "/passwords.txt", "w")
+	local str = ''
 	for UUID, Password in pairs(self.m_Passwords) do
-		File:write("['", UUID, "'] = '", Password, "',\n")
+		str = str .. UUID .. "=" .. Password .. "\n"
 	end
+	
+	local File = io.open(self.m_Path, "wb")
+	File:write(cStringCompression.CompressStringZLIB(str, g_Config.CompressionLevel))
 	File:close()
 end
 
