@@ -71,7 +71,7 @@ function cSQLiteStorage:RegisterOrChangePassword(a_UUID, a_Password)
 		return false, "There were multiple users with the same UUID"
 	end
 	
-	local updateList = cUpdateList:Update("password", cCryptoHash.md5HexString(a_Password))
+	local updateList = cUpdateList():Update("password", cCryptoHash.md5HexString(a_Password))
 	local res = self.m_DB:Update("players", updateList, whereList)
 	
 	if (not res) then

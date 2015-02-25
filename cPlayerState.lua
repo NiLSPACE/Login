@@ -96,6 +96,27 @@ end
 
 
 
+function cPlayerState:TryChangePassword(a_OldPassword, a_NewPassword)
+	if (not self:Exists()) then
+		return false, "You are not registered"
+	end
+	
+	if (g_PassStorage:GetPasswordFromUUID(self.m_UUID) ~= cCryptoHash.md5HexString(a_OldPassword)) then
+		return false, "The password is incorrect"
+	end
+	
+	local res, Err = g_PassStorage:RegisterOrChangePassword(self.m_UUID, a_NewPassword)
+	if (not res) then
+		return false, Err
+	end
+	
+	return true
+end
+
+
+
+
+
 function cPlayerState:TeleportBack()
 	if (self.m_IsLoggedIn) then
 		-- Don't teleport a player when he's already logged in

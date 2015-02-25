@@ -61,3 +61,35 @@ end
 
 
 
+function HandleChangePassCommand(a_Split, a_Player)
+	local PlayerState = GetPlayerState(a_Player)
+	if (not PlayerState:IsLoggedIn()) then
+		a_Player:SendMessage("Login first before trying to change your name")
+		return true
+	end
+	
+	if (#a_Split ~= 4) then
+		a_Player:SendMessage(a_Split[1] .. " <current password> <new password> <confirm password>")
+		return true
+	end
+	
+	if (a_Split[3] ~= a_Split[4]) then
+		a_Player:SendMessage("The new password and confirmation password don't match")
+		return true
+	end
+	
+	local res, Err = PlayerState:TryChangePassword(a_Split[2], a_Split[3])
+	if (not res) then
+		a_Player:SendMessage(Err)
+		return true
+	end
+	
+	a_Player:SendMessage("The password is changed")
+	return true
+end
+	
+
+
+
+
+

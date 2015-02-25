@@ -23,8 +23,16 @@ g_PluginInfo =
 		['/register'] =
 		{
 			Permission = "login.register",
-			HelpString = "Register an account =",
+			HelpString = "Register an account",
 			Handler    = HandleRegisterCommand,
+		},
+		
+		['/changepass'] =
+		{
+			Alias      = {"/updatepass"},
+			Permission = "login.changepass",
+			HelpString = "Change your password",
+			Handler    = HandleChangePassCommand,
 		},
 	},
 }
