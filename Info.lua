@@ -35,6 +35,27 @@ g_PluginInfo =
 			Handler    = HandleChangePassCommand,
 		},
 	},
+	
+	Permissions =
+	{
+		["login.login"] =
+		{
+			Description = "Allows a player to log in",
+			RecommendedGroups = "Default",
+		},
+		
+		["login.register"] =
+		{
+			Description = "Allows a player to create an account for himself.",
+			RecommendedGroups = "Default",
+		},
+		
+		["login.changepass"]=
+		{
+			Description = "Allows a player to change his password.",
+			RecommendedGroups = "Default",
+		},
+	},
 }
 
 
