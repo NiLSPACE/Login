@@ -12,6 +12,7 @@ function InitHooks(a_Plugin)
 	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_RIGHT_CLICK, OnPlayerRightClick)
 	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_SPAWNED,     OnPlayerSpawned)
 	cPluginManager:AddHook(cPluginManager.HOOK_TAKE_DAMAGE,        OnTakeDamage)
+	cPluginManager:AddHook(cPluginManager.HOOK_WORLD_TICK,         OnWorldTick)
 end
 
 
@@ -125,8 +126,8 @@ function OnPlayerMoving(a_Player, a_OldPosition, a_NewPosition)
 		return false
 	end
 	
-	if (PlayerState.Teleporting) then
-		PlayerState.Teleporting = false -- Player teleported
+	if (PlayerState.m_Teleporting) then
+		PlayerState.m_Teleporting = false -- Player teleported
 		return false
 	end
 	
@@ -214,6 +215,19 @@ function OnTakeDamage(a_Receiver, a_TDI)
 		return false
 	end
 	return true
+end
+
+
+
+
+
+function OnWorldTick(a_World, a_TimeDelta)
+	a_World:ForEachPlayer(
+		function(a_Player)
+			local PlayerState = GetPlayerState(a_Player)
+			PlayerState:TickMessage()
+		end
+	)
 end
 
 

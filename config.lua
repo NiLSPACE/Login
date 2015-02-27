@@ -4,9 +4,10 @@
 
 
 g_ConfigDefaults = 
-[[
-Storage = "sqlite"
-]]
+{
+	Storage          = "sqlite",
+	LoginMessageTime = 50,
+}
 
 
 
@@ -54,6 +55,22 @@ function InitConfig()
 		ConfigTable.CompressionLevel = tonumber(ConfigTable.CompressionLevel)
 	end
 	
+	if (type(ConfigTable.LoginMessageTime) ~= 'number') then
+		if (type(ConfigTable.LoginMessageTime) == 'string') then
+			local Time = tonumber(ConfigTable.LoginMessageTime)
+			if (not Time) then
+				LOGWARNING("[Login] Invalid login message time. Default will be used.")
+				ConfigTable.LoginMessageTime = g_ConfigDefaults.LoginMessageTime
+			else
+				ConfigTable.LoginMessageTime = Time
+			end
+		else
+			LOGWARNING("[Login] Invalid login message time. Default will be used.")
+			ConfigTable.LoginMessageTime = g_ConfigDefaults.LoginMessageTime
+		end
+	end
+			
+	
 	g_Config = ConfigTable
 end
 
@@ -62,7 +79,7 @@ end
 
 
 function LoadDefaultSettings()
-	g_Config = loadstring("return {" .. g_ConfigDefaults .. "}")()
+	g_Config = g_ConfigDefaults
 end
 
 
