@@ -13,12 +13,18 @@ function Initialize(a_Plugin)
 	-- Bind all the commands:
 	RegisterPluginInfoCommands();
 	
+	-- Load and initialize the config.
 	InitConfig()
+	
+	-- Load the password storage according to the config file
 	InitStorage()
+	
+	-- Load the hooks
 	InitHooks()
 	
 	cRoot:Get():ForEachPlayer(
 		function(a_Player)
+			-- Log all the users that are currently online in
 			GetPlayerState(a_Player, true)
 		end
 	)
