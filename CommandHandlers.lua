@@ -87,8 +87,6 @@ function HandleChangePassCommand(a_Split, a_Player)
 	a_Player:SendMessage("The password is changed")
 	return true
 end
-	
-
 
 
 
