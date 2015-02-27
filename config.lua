@@ -15,7 +15,8 @@ g_ConfigDefaults =
 function InitConfig()
 	local Path = cPluginManager:Get():GetCurrentPlugin():GetLocalFolder() .. "/config.cfg"
 	if (not cFile:Exists(Path)) then
-		LOGWARNING("[Login] The config file doesn't exist. Login will use the default settings for now")
+		LOGWARNING("[Login] The config file doesn't exist. Login will write and load the default settings for now")
+		WriteDefaultSettings(Path)
 		LoadDefaultSettings()
 		return
 	end
@@ -81,6 +82,19 @@ end
 function LoadDefaultSettings()
 	g_Config = g_ConfigDefaults
 end
+
+
+
+
+function WriteDefaultSettings(a_Path)
+	local File = io.open(a_Path, "w")
+	for Key, Value in pairs(g_ConfigDefaults) do
+		local StringToFormat = type(Value) == 'string' and "%s = '%s',\n" or "%s = %s,\n"
+		File:write(StringToFormat:format(Key, Value))
+	end
+	File:close()
+end
+
 
 
 
