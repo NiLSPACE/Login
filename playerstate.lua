@@ -3,7 +3,7 @@
 
 
 
-g_PlayerStates = {}
+local g_PlayerStates = {}
 
 
 
