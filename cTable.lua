@@ -3,6 +3,26 @@
 
 
 
+--[[
+	cTable is a class used to create a new table in an sql database if it doesn't exist yet.
+	The constructor has one parameter. This is the name of the table.
+	
+	After that you can add a new field (or column) using the Field function.
+	The field function has 3 parameters where the last one is optional:
+	Parameter 1: The name of the field
+	Parameter 2: The type of the field
+	(Parameter3:) Optional attributes of the field.
+	
+	Example:
+		cTable("TestTable")
+		:Field("ID", "INTEGER", "PRIMARY KEY AUTOINCREMENT")
+		:Field("name", "TEXT")
+]]
+
+
+
+
+
 cTable = {}
 
 
@@ -25,6 +45,7 @@ end
 
 
 
+-- Adds a new field to the table
 function cTable:Field(a_Name, a_Type, a_Attributes)
 	table.insert(self.m_Fields, {name = a_Name, type = a_Type, attributes = a_Attributes})
 	
@@ -35,6 +56,7 @@ end
 
 
 
+-- Composes the fields in a valid sql string that can be used by the database directly.
 function cTable:Compose()
 	local str = ('CREATE TABLE IF NOT EXISTS "%s" ('):format(self.m_Name)
 	for _, field in ipairs(self.m_Fields) do
