@@ -3,6 +3,25 @@
 
 
 
+--[[
+	cInsertList is a class used to define new values in an table row.
+	
+	It has 2 functions. Insert to add new values to the list and Compose to make a string out of everything.
+	The parameters for Insert are:
+	Parameter 1: The name of the field
+	Parameter 2: The value to give it.
+	
+	Insert returns the itself, so you can continue inserting new values.
+	Example:
+		local insertList = cInsertList()
+		:Insert("name", "NiLSPACE") -- Insert "NiLSPACE" in the field "name"
+		:Insert("isadmin", 1)       -- Insert 1 in the field "isadmin"
+]]
+
+
+
+
+
 cInsertList = {}
 
 
@@ -24,6 +43,7 @@ end
 
 
 
+-- Adds a new value to the list
 function cInsertList:Insert(a_Field, a_Val)
 	a_Field = EscapeString(a_Field)
 	a_Val   = EscapeString(a_Val)
@@ -36,6 +56,7 @@ end
 
 
 
+-- Composes all the values into a valid sql string.
 function cInsertList:Compose()
 	local fieldList = "("
 	local valueList = "("
