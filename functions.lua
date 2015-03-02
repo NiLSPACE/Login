@@ -7,7 +7,7 @@ function isArray(a_Table)
 	local i = 0
 	for _, t in pairs(a_Table) do
 		i = i + 1
-		if (not rawget(a_Table, i)) then--[i] == nil) then
+		if (not rawget(a_Table, i)) then
 			return false
 		end
 	end
