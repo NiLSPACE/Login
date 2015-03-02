@@ -105,6 +105,20 @@ end
 
 
 
+function cSQLiteStorage:DeleteUUID(a_UUID)
+	local res = self.m_DB:Delete("players", cWhereList():Where("uuid", a_UUID))
+	
+	if (not res) then
+		return false, "Something went wrong in the database"
+	end
+	
+	return true
+end
+
+
+
+
+
 function cSQLiteStorage:Disable()
 	-- cSQLiteStorage doesn't have to save the passwords when disabling.
 end

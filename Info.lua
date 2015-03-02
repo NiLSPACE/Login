@@ -38,6 +38,13 @@ This would be particuarly useful for servers that don't use the traditional Mine
 			HelpString = "Change your password",
 			Handler    = HandleChangePassCommand,
 		},
+		
+		['/removeacc'] =
+		{
+			Permission = "login.removeacc",
+			HelpString = "Remove an account from the database",
+			Handler    = HandleRemoveAccountCommand,
+		},
 	},
 	
 	Permissions =

@@ -91,3 +91,35 @@ end
 
 
 
+
+function HandleRemoveAccountCommand(a_Split, a_Player)
+	if (not a_Split[2]) then
+		a_Player:SendMessage("Usage: /removeacc <username>")
+		return true
+	end
+	
+	-- Remove /removeacc from the split table
+	table.remove(a_Split, 1)
+	
+	-- Get the full username
+	local PlayerName = table.concat(a_Split, " ")
+	local TargetUUID = GetUUIDFromPlayerName(PlayerName)
+
+	if (not g_PassStorage:UUIDExists(TargetUUID)) then
+		a_Player:SendMessage("Player doesn't exist")
+		return true
+	end
+	
+	local res, Err = g_PassStorage:DeleteUUID(TargetUUID)
+	if (not res) then
+		a_Player:SendMessage(Err)
+		return true
+	end
+	
+	a_Player:SendMessage("The player is removed")
+	return true
+end
+
+
+
+

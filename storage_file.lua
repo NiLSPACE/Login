@@ -62,6 +62,15 @@ end
 
 
 
+function cFileStorage:DeleteUUID(a_UUID)
+	self.m_Passwords[a_UUID] = nil
+	return true
+end
+
+
+
+
+
 function cFileStorage:Disable()
 	local str = ''
 	for UUID, Password in pairs(self.m_Passwords) do
