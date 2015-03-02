@@ -112,7 +112,7 @@ end
 
 
 -- Constructor
-function cSQLiteHandler:__call(a_Path, a_Table)
+function cSQLiteHandler:__call(a_Path, a_Tables)
 	local m_DB, ErrCode, ErrMsg = sqlite3.open(a_Path)
 	
 	if (not m_DB) then
@@ -127,12 +127,19 @@ function cSQLiteHandler:__call(a_Path, a_Table)
 	
 	Obj.m_DB = m_DB
 	
-	if (a_Table ~= nil) then
-		-- a_Table isn't nil, so we must create a new table if it doesn't exist
-		local sql = a_Table:Compose()
-		local res, Err = Obj:Query(sql)
-		if (not res) then
-			LOGWARNING("Could not create table %s", Err)
+	if (a_Tables ~= nil) then
+		-- a_Table isn't nil, so we must create a new table if it doesn't exist.
+		if (not isArray(a_Tables)) then
+			-- a_Tables isn't an array. Then it's probably a cTable class. Put it in an array
+			a_Tables = {a_Tables}
+		end
+		
+		for _, Table in ipairs(a_Tables) do
+			local sql = Table:Compose()
+			local res, Err = Obj:Query(sql)
+			if (not res) then
+				LOGWARNING("Could not create table '%s' because: %s", Table.m_Name, Err)
+			end
 		end
 	end
 	
