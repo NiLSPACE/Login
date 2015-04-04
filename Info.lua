@@ -61,11 +61,17 @@ This would be particuarly useful for servers that don't use the traditional Mine
 			RecommendedGroups = "Default",
 		},
 		
-		["login.changepass"]=
+		["login.changepass"] =
 		{
 			Description = "Allows a player to change his password.",
 			RecommendedGroups = "Default",
 		},
+		
+		["login.removeacc"] =
+		{
+			Description = "Allows a player to remove an account",
+			RecommendedGroups = "Admins",
+		}
 	},
 	
 	AdditionalInfo =

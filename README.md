@@ -11,7 +11,7 @@ If a configuration file doesn't exist yet Login will create one with the default
 
 If the storage is set to file then you can also change the compression of the password file.
 
-   -  CompressionLevel: A number where 0 is no compression and 9 is maximum compression.
+  -  CompressionLevel: A number where 0 is no compression and 9 is maximum compression.
 
  
 
@@ -23,6 +23,7 @@ If the storage is set to file then you can also change the compression of the pa
 |/changepass | login.changepass | Change your password|
 |/login | login.login | Login into the server|
 |/register | login.register | Register an account|
+|/removeacc | login.removeacc | Remove an account from the database|
 
 
 
@@ -32,3 +33,4 @@ If the storage is set to file then you can also change the compression of the pa
 | login.changepass | Allows a player to change his password. | `/changepass` | Default |
 | login.login | Allows a player to log in | `/login` | Default |
 | login.register | Allows a player to create an account for himself. | `/register` | Default |
+| login.removeacc | Allows a player to remove an account | `/removeacc` | Admins |
