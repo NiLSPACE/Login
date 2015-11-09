@@ -14,7 +14,7 @@ g_ConfigDefaults =
 
 function InitConfig()
 	local Path = cPluginManager:Get():GetCurrentPlugin():GetLocalFolder() .. "/config.cfg"
-	if (not cFile:Exists(Path)) then
+	if (not cFile:IsFile(Path)) then
 		LOGWARNING("[Login] The config file doesn't exist. Login will write and load the default settings for now")
 		WriteDefaultSettings(Path)
 		LoadDefaultSettings()
