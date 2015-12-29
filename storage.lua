@@ -14,14 +14,12 @@ function InitStorage()
 	local StorageType = g_Config.Storage:lower()
 	
 	if (StorageType == 'sqlite') then
-		g_PassStorage = cSQLiteStorage()
-	elseif (StorageType == 'file') then
-		g_PassStorage = cFileStorage()
+		g_PassStorage = cSQLiteStorage:new()
 	end
 	
 	if (g_PassStorage == nil) then
 		LOGWARNING("[Login] Unknown storage type. Using SQLite")
-		g_PassStorage = cSQLiteStorage()
+		g_PassStorage = cSQLiteStorage:new()
 	end
 end
 
