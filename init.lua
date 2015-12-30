@@ -5,7 +5,7 @@
 
 function Initialize(a_Plugin)
 	a_Plugin:SetName("Login")
-	a_Plugin:SetVersion(2)
+	a_Plugin:SetVersion(g_PluginInfo.Version)
 	
 	-- Load the InfoReg shared library:
 	dofile(cPluginManager:GetPluginsPath() .. "/InfoReg.lua")
