@@ -53,28 +53,31 @@ end
 -- If a callback is given it calls that for each row where the parameter is a dictionary
 -- Returns true on success, while it returns false with the error message when failing
 function cSQLiteStorage:ExecuteCommand(a_QueryName, a_Parameters, a_Callback)
-	local Command = assert(g_Queries[a_QueryName], "Requested Query doesn't exist")
-	local Stmt, ErrCode, ErrMsg = self.DB:prepare(Command)
-	if (not Stmt) then
-		LOGWARNING("Cannot prepare query \"" .. a_QueryName .. "\": " .. (ErrCode or "<unknown>") .. " (" .. (ErrMsg or "<no message>") .. ")")
-		return false, ErrorMsg or "<no message>"
-	end
+	local Commands = assert(g_Queries[a_QueryName], "Requested Query doesn't exist")
 	
-	if (a_Parameters ~= nil) then
-		Stmt:bind_names(a_Parameters)
-	end
-	
-	if (a_Callback ~= nil) then
-		for val in Stmt:nrows() do
-			if (a_Callback(val)) then
-				break
-			end
+	for _, Sql in pairs(StringSplit(Commands, ";")) do
+		local Stmt, ErrCode, ErrMsg = self.DB:prepare(Sql)
+		if (not Stmt) then
+			LOGWARNING("Cannot prepare query \"" .. a_QueryName .. "\": " .. (ErrCode or "<unknown>") .. " (" .. (ErrMsg or "<no message>") .. ")")
+			return false, ErrorMsg or "<no message>"
 		end
-	else
-		Stmt:step()
+		
+		if (a_Parameters ~= nil) then
+			Stmt:bind_names(a_Parameters)
+		end
+		
+		if (a_Callback ~= nil) then
+			for val in Stmt:nrows() do
+				if (a_Callback(val)) then
+					break
+				end
+			end
+		else
+			Stmt:step()
+		end
+		
+		Stmt:finalize()
 	end
-	
-	Stmt:finalize()
 	return true
 end
 
