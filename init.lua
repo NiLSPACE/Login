@@ -29,6 +29,11 @@ function Initialize(a_Plugin)
 		end
 	)
 	
+	if (g_Config.NetworkAPI.Enabled) then
+		InitNetworkAPI(g_Config.NetworkAPI.Port)
+		LOGINFO("[Login] API is running on port " .. g_Config.NetworkAPI.Port)
+	end
+	
 	LOG("Login is initialized")
 	return true
 end
@@ -49,6 +54,7 @@ function OnDisable()
 	)
 	
 	g_PassStorage:Disable()
+	DisableNetworkAPI()
 end
 
 

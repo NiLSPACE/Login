@@ -3,12 +3,17 @@
 
 
 
-g_ConfigDefaults = 
-{
-	Storage          = "sqlite",
-	LoginMessageTime = 50,
-}
+g_ConfigDefaults = [[ 
+Storage          = "sqlite",
+LoginMessageTime = 50,
 
+NetworkAPI = 
+{
+	Enabled = false,
+	Secret = '',
+	Port = 8888
+}
+]]
 
 
 
@@ -70,7 +75,17 @@ function InitConfig()
 			ConfigTable.LoginMessageTime = g_ConfigDefaults.LoginMessageTime
 		end
 	end
-			
+	
+	if (ConfigTable.NetworkAPI and ConfigTable.NetworkAPI.Enabled) then
+		if (ConfigTable.NetworkAPI.Secret:len() < 10) then
+			LOGWARNING("[Login] The NetworkAPI is enabled, but your Secret is too short. Please provide a more secure secret.")
+			LOGWARNING("[Login] The network API is disabled.")
+			ConfigTable.NetworkAPI.Enabled = false
+		end
+	end
+	
+	-- prevent errors with older configuration files
+	ConfigTable.NetworkAPI = ConfigTable.NetworkAPI or {}
 	
 	g_Config = ConfigTable
 end
@@ -80,7 +95,7 @@ end
 
 
 function LoadDefaultSettings()
-	g_Config = g_ConfigDefaults
+	g_Config = loadstring("return {" .. g_ConfigDefaults .. "}")()
 end
 
 
@@ -88,10 +103,7 @@ end
 
 function WriteDefaultSettings(a_Path)
 	local File = io.open(a_Path, "w")
-	for Key, Value in pairs(g_ConfigDefaults) do
-		local StringToFormat = type(Value) == 'string' and "%s = '%s',\n" or "%s = %s,\n"
-		File:write(StringToFormat:format(Key, Value))
-	end
+	File:write(g_ConfigDefaults)
 	File:close()
 end
 
