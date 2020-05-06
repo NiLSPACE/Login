@@ -13,6 +13,8 @@ function InitHooks(a_Plugin)
 	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_SPAWNED,     OnPlayerSpawned)
 	cPluginManager:AddHook(cPluginManager.HOOK_TAKE_DAMAGE,        OnTakeDamage)
 	cPluginManager:AddHook(cPluginManager.HOOK_WORLD_TICK,         OnWorldTick)
+    cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_TOSSING_ITEM,OnPlayerTossingItem)
+
 end
 
 
@@ -230,6 +232,17 @@ function OnWorldTick(a_World, a_TimeDelta)
 	)
 end
 
-
-
-
+function OnPlayerTossingItem(a_Player)
+	local PlayerState = GetPlayerState(a_Player)
+	if (PlayerState:IsLoggedIn()) then
+		return false
+	end
+	
+	a_Player:SendMessage(
+		cCompositeChat()
+		:AddTextPart("Please use ")
+		:AddSuggestCommandPart("/login", "/login", "u")
+		:AddTextPart(" first.")
+	)
+	return true
+end
